@@ -212,14 +212,15 @@ p { margin: 0 0 1em; }
   box-shadow: 0 40px 100px -40px rgba(0, 0, 0, .85);
 }
 .lab-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 10px; }
-.lab-kicker { margin: 0 0 4px; font: 500 .72rem/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: #5eead4; }
+.lab-kicker { display: flex; align-items: center; gap: 10px; margin: 0 0 6px; font: 500 .72rem/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: #5eead4; }
 .lab-head h2 { margin: 0; color: #fff; font-size: clamp(1.1rem, 1.8vw, 1.35rem); }
-.lab-head-right { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 10px; }
+.lab-head-right { flex: none; display: flex; align-items: center; }
 .seg-scene .seg-opts span { padding: 7px 13px; }
-.lab-badge { flex: none; display: inline-flex; align-items: center; gap: 7px; padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(94, 234, 212, .35); font: 500 .7rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: #5eead4; }
+.lab-badge { flex: none; display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px; font-size: .64rem !important; border-radius: 999px; border: 1px solid rgba(94, 234, 212, .35); font: 500 .7rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: #5eead4; }
 .lab-badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #2dd4bf; animation: pulse 2s infinite; }
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(45, 212, 191, .55); } 70% { box-shadow: 0 0 0 8px rgba(45, 212, 191, 0); } 100% { box-shadow: 0 0 0 0 rgba(45, 212, 191, 0); } }
 @media (prefers-reduced-motion: reduce) { .lab-badge::before { animation: none; } }
+@media (min-width: 901px) { .lab-caption { min-height: 6em; } }
 .lab-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(300px, 1fr); grid-template-areas: "room side" "tl tl"; gap: 14px; }
 .lab-room { grid-area: room; min-width: 0; }
 .lab-side { grid-area: side; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
