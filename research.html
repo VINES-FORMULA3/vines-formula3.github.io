@@ -1,0 +1,341 @@
+---
+redirect_from: /research.html
+title: Research
+kicker: Research
+lede: FR3 is a strong candidate band for 6G, but indoor channels change constantly as people move, rooms fill, and furniture shifts. FORMULA3 develops the measurements, models, and AI needed to keep service consistent through those changes.
+description: The FORMULA3 research program, covering FR3 hybrid programmable wireless environments, physics-informed AI for proactive resource management, ISAC-driven generalization, and the project timeline.
+---
+
+<nav class="subnav" aria-label="On this page">
+  <div class="wrap">
+    <ul>
+      <li><a href="#challenge">Challenge</a></li>
+      <li><a href="#approach">Approach</a></li>
+      <li><a href="#thrusts">Thrusts</a></li>
+      <li><a href="#t1">T1</a></li>
+      <li><a href="#t2">T2</a></li>
+      <li><a href="#t3">T3</a></li>
+      <li><a href="#t4">T4</a></li>
+      <li><a href="#vectors">VINES vectors</a></li>
+      <li><a href="#timeline">Timeline</a></li>
+      <li><a href="#infrastructure">Infrastructure</a></li>
+      <li><a href="#glossary">Glossary</a></li>
+    </ul>
+  </div>
+</nav>
+
+<section id="challenge" class="research-section">
+  <div class="wrap">
+    <div class="two-col">
+      <div>
+        <p class="eyebrow">The challenge</p>
+        <h2>Great spectrum, unpredictable rooms</h2>
+        <p>The upper mid-band (FR3, 7–24 GHz) offers hundreds of MHz of spectrum and penetrates walls better than mmWave. That makes it attractive for indoor and outdoor-to-indoor (O2I) 6G services such as immersive AR/VR, tele-surgery, and holographic communication. FR3 links can still be blocked by people, furniture, and changes to a room's layout.</p>
+        <p><strong>Programmable wireless environments (PWEs)</strong> address this by placing controllable surfaces on walls to steer signals around obstacles. But most current control is <em>reactive</em>. It responds after a link fails, which causes latency spikes and throughput drops that emerging applications cannot tolerate.</p>
+      </div>
+      <div>
+        <p class="eyebrow">What dynamics do to channels</p>
+        <ul class="arrow-list">
+          <li><strong>General channel models break down.</strong> In our earlier mmWave studies, fitted statistical models were off by 12–18% once users moved and rooms changed. Similar effects are expected in FR3.</li>
+          <li><strong>Channels become sparse.</strong> Outages come and go over time, and many surface elements are shadowed at any given moment.</li>
+          <li><strong>Channels are non-stationary.</strong> Channel statistics shift with occupancy, with each user's mobility stage (entering, wandering, leaving), and with the room's layout.</li>
+          <li><strong>So AI struggles to generalize.</strong> In our tests, conventional models lost more than 50% of their performance when conditions differed from their training data.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="approach" class="research-section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">The FORMULA3 approach</p>
+      <h2>Proactive, physics-informed, and context-aware</h2>
+      <p>FORMULA3 is a <strong>F</strong>ramework for <strong>O</strong>ptimal <strong>R</strong>esource <strong>M</strong>anagement <strong>U</strong>sing Genera<strong>L</strong>izable <strong>A</strong>I in FR<strong>3</strong> dynamic PWEs. It rests on three ideas.</p>
+    </div>
+    <div class="cards-3">
+      <div class="card">
+        <span class="card-label">01 · Proactive control</span>
+        <h3>Act before the outage</h3>
+        <p>Predict future channel gains at every surface, drop the shadowed ones from consideration, and reconfigure ahead of time. Fewer interruptions mean lower latency and less signaling.</p>
+      </div>
+      <div class="card">
+        <span class="card-label">02 · Physics-informed AI</span>
+        <h3>Learn with the physics</h3>
+        <p>Build propagation knowledge from validated channel models into the training loss, and densify sparse channel data, so predictions stay accurate with only a few channel sensors.</p>
+      </div>
+      <div class="card">
+        <span class="card-label">03 · ISAC context</span>
+        <h3>Sense the room, then decide</h3>
+        <p>Infer occupancy, user mobility, and layout changes from the wireless channel itself. Use that context to pick a specialized model, or to trigger continual learning when the room changes significantly.</p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:40px">Hybrid surfaces in FR3</h3>
+    <p class="muted" style="max-width:760px">FORMULA3 combines three kinds of programmable surfaces whose strengths complement each other, balancing passive and active control and adapting to line-of-sight (LoS) and non-line-of-sight (NLoS) transitions.</p>
+    <div class="surfaces">
+      <div class="surface"><b>RIS</b><span>Reconfigurable intelligent surfaces: nearly passive beam steering with low power use.</span></div>
+      <div class="surface"><b>SIM</b><span>Stacked intelligent metasurfaces: multi-layer, active wavefront shaping and beamforming.</span></div>
+      <div class="surface"><b>MRA</b><span>Metallic (Fresnel) reflector arrays: low cost and versatile across frequencies.</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="thrusts" class="research-section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">How the work fits together</p>
+      <h2>Research thrusts</h2>
+      <p>Channel data and models from T1 feed the AI of T2 and T3. T4 validates everything against measurements.</p>
+    </div>
+
+    <div class="diagram" role="img" aria-label="Thrust diagram. T1 produces channel data and models, which feed T2 and T3. T2 passes AI models to T3. T2 and T3 both feed T4 validation and evaluation.">
+      <div class="dg-box dg-t1">
+        <h3><span>T1</span>Channel Characterization and Dataset Generation</h3>
+        <div class="dg-row">
+          <div class="dg-task"><b>T1.1</b>Measurement campaign and channel characterization</div>
+          <div class="dg-task"><b>T1.2</b>Simulation platform and data generation</div>
+        </div>
+      </div>
+      <div class="dg-flow dg-f1"><span>channel data &amp; models</span><span>channel data &amp; models</span></div>
+      <div class="dg-box dg-t2">
+        <h3><span>T2</span>AI-Native Proactive Resource Management</h3>
+        <div class="dg-tasks">
+          <div class="dg-task"><b>T2.1</b>Physics-informed surface channel prediction</div>
+          <div class="dg-task"><b>T2.2</b>Shadowed surface exclusion</div>
+          <div class="dg-task"><b>T2.3</b>User assignment and surface configuration</div>
+        </div>
+      </div>
+      <div class="dg-ai">AI<br>models</div>
+      <div class="dg-box dg-t3">
+        <h3><span>T3</span>AI Generalization via ISAC and Continual Learning</h3>
+        <div class="dg-tasks">
+          <div class="dg-task"><b>T3.1</b>ISAC module for contextual awareness and context-aware adaptation</div>
+          <div class="dg-task"><b>T3.2</b>Online adaptation and continual learning</div>
+        </div>
+      </div>
+      <div class="dg-flow dg-f2"><span>strategies</span><span>adaptive models</span></div>
+      <div class="dg-box dg-t4">
+        <h3><span>T4</span>Validation and Evaluation</h3>
+        <div class="dg-row">
+          <div class="dg-task"><b>T4.1 · T4.2</b>Validate channel models and evaluate AI models</div>
+          <div class="dg-task"><b>T4.3 · T4.4</b>Generalization ability and end-to-end FORMULA3 evaluation</div>
+        </div>
+      </div>
+    </div>
+
+    <article id="t1" class="thrust-detail t1">
+      <header>
+        <span class="badge">T1</span>
+        <div>
+          <h2>Channel characterization and dataset generation</h2>
+          <p>No public datasets or validated channel models yet exist for FR3 hybrid PWEs that capture near-field effects, hardware constraints, and real-world dynamics. T1 builds both.</p>
+        </div>
+      </header>
+      <div class="task-list">
+        <div class="task">
+          <span class="tid">T1.1</span>
+          <h3>FR3 hybrid PWE channel characterization</h3>
+          <p>A measurement campaign on fabricated FR3 RIS prototypes and in-house metallic reflector arrays, using CST simulations, anechoic-chamber measurements, and real indoor and O2I deployments. An automated, closed-loop system with motorized positioners sweeps angles while cycling surface configurations. It captures reflection, beam patterns, polarization, inter-element coupling, nonlinear hardware behavior, and near-field effects.</p>
+          <p class="lead">Lead: Ekin (Texas A&amp;M), Rappaport (NYU)</p>
+        </div>
+        <div class="task">
+          <span class="tid">T1.2</span>
+          <h3>Simulation platform for dynamic data</h3>
+          <p>A simulation suite connects CST Studio and NVIDIA Sionna through a shared 3D environment model and custom Python middleware. It produces large datasets with multi-user mobility, changing occupancy, and layout changes. Every sample carries an environment label that T3 uses for context awareness.</p>
+          <p class="lead">Lead: Ekin, Abdelhadi (Texas A&amp;M)</p>
+        </div>
+      </div>
+    </article>
+
+    <article id="t2" class="thrust-detail t2">
+      <header>
+        <span class="badge">T2</span>
+        <div>
+          <h2>AI-native proactive resource management and hybrid surface control</h2>
+          <p>Physics-informed AI that builds FR3 channel knowledge into training, so the network can predict, prune, and configure surfaces before problems occur.</p>
+        </div>
+      </header>
+      <div class="task-list">
+        <div class="task">
+          <span class="tid">T2.1</span>
+          <h3>Surface channel prediction</h3>
+          <p>A physics-informed graph neural network predicts channel gains across RIS tiles and reflector plates from only a few channel sensors. A learned sensor placement balances accuracy against energy use, and a densification step handles temporal sparsity.</p>
+          <p class="lead">Lead: Ismail (Tennessee Tech)</p>
+        </div>
+        <div class="task">
+          <span class="tid">T2.2</span>
+          <h3>Exclusion of shadowed surfaces</h3>
+          <p>Shadowed elements add overhead without helping coverage. An exclusion score accounts for both blockage and LoS/NLoS interference, and an adaptive reinforcement-learning policy decides how often to update it.</p>
+          <p class="lead">Lead: Ismail (Tennessee Tech)</p>
+        </div>
+        <div class="task">
+          <span class="tid">T2.3</span>
+          <h3>User assignment and surface configuration</h3>
+          <p>LoS and reflected signals can interfere destructively. An actor-critic policy assigns users to surfaces and configures SIM, RIS, and MRA together to minimize interference and outage while limiting energy use.</p>
+          <p class="lead">Lead: Basar (Tampere)</p>
+        </div>
+      </div>
+    </article>
+
+    <article id="t3" class="thrust-detail t3">
+      <header>
+        <span class="badge">T3</span>
+        <div>
+          <h2>Enhancing AI generalization via ISAC-enabled context awareness</h2>
+          <p>A model trained for one occupancy level can lose much of its accuracy at another. T3 aims to keep degradation under unseen dynamics below 2%.</p>
+        </div>
+      </header>
+      <div class="task-list">
+        <div class="task">
+          <span class="tid">T3.1</span>
+          <h3>Context-aware ISAC framework</h3>
+          <p>A three-step pipeline of sensing, context inference, and model selection. It identifies occupancy level and mobility stage from the channel and invokes a model trained for those conditions. Sensing and resource management are optimized end to end, with environment-aware configuration codebooks.</p>
+          <p class="lead">Lead: Wichman (Aalto)</p>
+        </div>
+        <div class="task">
+          <span class="tid">T3.2</span>
+          <h3>Continual learning under concept drift</h3>
+          <p>When furniture moves or a room is rearranged, the system detects the drift, trains a replacement model in shadow mode with transfer learning, and swaps it in once it outperforms the old one, without interrupting service.</p>
+          <p class="lead">Lead: Ismail (Tennessee Tech)</p>
+        </div>
+      </div>
+    </article>
+
+    <article id="t4" class="thrust-detail t4">
+      <header>
+        <span class="badge">T4</span>
+        <div>
+          <h2>Validation and evaluation</h2>
+          <p>A unified simulation and measurement platform benchmarks every model across realistic dynamic environments, including mobility, occupancy, and layout changes.</p>
+        </div>
+      </header>
+      <div class="task-list">
+        <div class="task">
+          <span class="tid">T4.1</span>
+          <h3>Channel models and data</h3>
+          <p>FR3 testbeds at about 7 GHz (Texas A&amp;M) and 15 GHz (Tampere) provide ground truth for the channel models and for statistical benchmarking of the synthetic data.</p>
+          <p class="lead">Lead: Ekin (Texas A&amp;M), Rappaport (NYU)</p>
+        </div>
+        <div class="task">
+          <span class="tid">T4.2</span>
+          <h3>Proactive resource management</h3>
+          <p>Prediction error, delay, complexity, savings in overhead and power, outage, QoS, load balance, and convergence.</p>
+          <p class="lead">Lead: Basar (Tampere)</p>
+        </div>
+        <div class="task">
+          <span class="tid">T4.3</span>
+          <h3>AI adaptation strategies</h3>
+          <p>Context-classification accuracy, inference latency, recovery time after drift, and robustness of static versus adaptive models.</p>
+          <p class="lead">Lead: Wichman (Aalto)</p>
+        </div>
+        <div class="task">
+          <span class="tid">T4.4</span>
+          <h3>End-to-end FORMULA3</h3>
+          <p>Does the full system deliver multi-Gbps throughput and sub-millisecond latency consistently across dynamic scenarios? QoS satisfaction, stability, and adaptation efficiency.</p>
+          <p class="lead">Lead: Ismail (Tennessee Tech)</p>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section id="vectors" class="research-section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">VINES research vectors</p>
+      <h2>Where FORMULA3 fits in VINES</h2>
+      <p>VINES (Verticals-enabling Intelligent Network Systems) is a joint program of NSF and the Research Council of Finland. FORMULA3 addresses three of its research vectors.</p>
+    </div>
+    <div class="vectors">
+      <div class="vector">
+        <div class="code">A1</div>
+        <h3>Enabling emerging verticals</h3>
+        <ul>
+          <li>Multi-Gbps throughput</li>
+          <li>Sub-millisecond latency</li>
+          <li>Indoor and O2I connectivity</li>
+          <li>Reliable QoS under dynamics</li>
+        </ul>
+      </div>
+      <div class="vector">
+        <div class="code">B1</div>
+        <h3>AI-native design</h3>
+        <ul>
+          <li>Physics-informed AI</li>
+          <li>Predictive resource management</li>
+          <li>Generalizable AI</li>
+          <li>Continual adaptation</li>
+        </ul>
+      </div>
+      <div class="vector">
+        <div class="code">B3</div>
+        <h3>Integrated sensing and communication</h3>
+        <ul>
+          <li>Occupancy sensing</li>
+          <li>Mobility awareness</li>
+          <li>Layout and context detection</li>
+          <li>Adaptive network control</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="timeline" class="research-section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Milestones</p>
+      <h2>Timeline</h2>
+      <p>The planned schedule in half-year periods, from the October 2026 start to September 2029.</p>
+    </div>
+    {% include gantt.html %}
+  </div>
+</section>
+
+<section id="infrastructure" class="research-section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Infrastructure</p>
+      <h2>Testbeds and tools</h2>
+    </div>
+    <div class="cards-3">
+      <div class="card">
+        <span class="card-label">Hardware</span>
+        <h3>Hybrid FR3 testbeds</h3>
+        <p>Fabricated FR3 RIS prototypes and in-house metallic reflector arrays (7–15 GHz), deployed in office and lab settings for indoor and O2I measurements.</p>
+      </div>
+      <div class="card">
+        <span class="card-label">Measurement</span>
+        <h3>Anechoic chambers and automation</h3>
+        <p>Chamber measurements at Texas A&amp;M (about 7 GHz) and Tampere University (about 15 GHz). An automated pan-tilt and rail system sweeps angles while cycling surface configurations. Channel sounding uses vector network analyzers and software-defined radios.</p>
+      </div>
+      <div class="card">
+        <span class="card-label">Simulation</span>
+        <h3>CST–Sionna suite</h3>
+        <p>Full-wave CST Studio models of surface elements feed NVIDIA Sionna ray tracing through Python middleware, and a REST API serves the data to AI training and testing.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="glossary" class="research-section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Glossary</p>
+      <h2>Terms used on this site</h2>
+    </div>
+    <dl class="glossary">
+      <div><dt><abbr>FR3</abbr>Frequency Range 3</dt><dd>The 7–24 GHz upper mid-band, between today's sub-6 GHz and mmWave bands, and a candidate band for 6G.</dd></div>
+      <div><dt><abbr>PWE</abbr>Programmable wireless environment</dt><dd>A space whose walls carry controllable surfaces, so the network can shape how radio waves travel.</dd></div>
+      <div><dt><abbr>RIS</abbr>Reconfigurable intelligent surface</dt><dd>A panel of tiny, tunable elements that redirects incoming signals with very little power.</dd></div>
+      <div><dt><abbr>SIM</abbr>Stacked intelligent metasurface</dt><dd>Several metasurface layers stacked to shape wavefronts and form beams directly in the wave domain.</dd></div>
+      <div><dt><abbr>MRA</abbr>Metallic reflector array</dt><dd>An array of metal (Fresnel) reflectors. Low cost, and it works across a wide range of frequencies.</dd></div>
+      <div><dt><abbr>ISAC</abbr>Integrated sensing and communication</dt><dd>Using the communication signal itself to sense the environment, such as how many people are present and how they move.</dd></div>
+      <div><dt><abbr>O2I</abbr>Outdoor-to-indoor</dt><dd>Links from an outdoor transmitter to users inside a building.</dd></div>
+      <div><dt><abbr>LoS / NLoS</abbr>(Non-)line-of-sight</dt><dd>Whether there is a direct path between transmitter and receiver, or only reflected paths.</dd></div>
+      <div><dt><abbr>QoS</abbr>Quality of service</dt><dd>The throughput, latency, and reliability an application actually experiences.</dd></div>
+      <div><dt><abbr>Concept drift</abbr></dt><dd>When the data an AI model sees in operation changes from the data it was trained on, for example after a room is rearranged.</dd></div>
+    </dl>
+  </div>
+</section>

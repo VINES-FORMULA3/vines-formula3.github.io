@@ -1,0 +1,215 @@
+---
+layout: default
+title: FORMULA3
+description: >-
+  FORMULA3 builds AI-native, sensing-aware FR3 (7–24 GHz) programmable wireless
+  environments that keep 6G connectivity reliable under real-world dynamics.
+  A joint NSF and Research Council of Finland VINES project.
+body_class: home
+scripts:
+  - /assets/js/pwe-sim.js
+---
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="eyebrow"><span class="pill">NSF × Research Council of Finland</span> VINES · Track 1</p>
+      <h1>FORMULA<span class="three">3</span></h1>
+      <p class="hero-title-long"><b>F</b>ramework for <b>O</b>ptimal <b>R</b>esource <b>M</b>anagement <b>U</b>sing Genera<b>L</b>izable <b>A</b>I in FR<b>3</b> Dynamic Programmable Wireless Environments</p>
+      <p class="hero-lede">Self-adapting FR3 networks that combine learning, sensing, and programmable environments to deliver reliable, high-throughput, low-latency 6G connectivity.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="{{ '/research/' | relative_url }}">Explore the research <span aria-hidden="true">→</span></a>
+        <a class="btn btn-ghost" href="{{ '/team/' | relative_url }}">Meet the team</a>
+      </div>
+    </div>
+
+    <figure class="sim-card" aria-labelledby="sim-caption">
+      <div class="sim-head">
+        <span>Dynamic PWE · top view</span>
+        <span class="live">Illustration</span>
+      </div>
+      <div class="sim-canvas-wrap">
+        <canvas id="pwe-sim" role="img" aria-label="Animated top view of a room. An access point reaches a moving user through RIS tiles on one wall and a metallic reflector array on another. People walking through the room shadow some tiles, which are excluded, and the beam is steered toward the user's predicted position."></canvas>
+        <p class="sim-fallback">An animated illustration of a programmable wireless environment appears here when JavaScript is enabled.</p>
+      </div>
+      <dl class="sim-hud" aria-live="off">
+        <div><dt>RIS tiles in use</dt><dd data-hud="tiles">–</dd></div>
+        <div><dt>Direct path</dt><dd data-hud="los">–</dd></div>
+        <div><dt>Sensed occupancy</dt><dd data-hud="occ">–</dd></div>
+      </dl>
+      <ul class="sim-legend">
+        <li><i style="background:#fbbf24"></i>Access point</li>
+        <li><i style="background:#2dd4bf"></i>RIS beam</li>
+        <li><i style="background:#a78bfa"></i>MRA beam</li>
+        <li><i style="background:#1b2438;border:1px solid #64748b"></i>Shadowed tile (excluded)</li>
+        <li><i style="background:#475569;border-radius:50%"></i>Person</li>
+      </ul>
+      <figcaption id="sim-caption" class="sim-caption">An illustration of the idea, not a channel model. People moving through the room shadow surface elements, so the network excludes those tiles, steers beams toward where the user will be, and tracks the occupancy as context.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <p class="eyebrow">The question</p>
+    <p class="question">How can <em>FR3 (7–24 GHz)</em> programmable wireless environments, built from RIS and metallic reflector arrays, keep communication fast and reliable as <em>people move, rooms fill, and furniture shifts</em>?</p>
+
+    <div class="spectrum" role="group" aria-label="Where FR3 sits in the radio spectrum">
+      <div class="spectrum-bar">
+        <div class="band-sub6">
+          <span class="band-range">&lt; 7 GHz</span>
+          <span class="band-name">Sub-6 GHz</span>
+          <span class="band-note">Good coverage, limited bandwidth</span>
+        </div>
+        <div class="band-fr3">
+          <span class="band-range">7–24 GHz</span>
+          <span class="band-name">FR3 upper mid-band</span>
+          <span class="band-note">A balance of bandwidth and coverage for 6G</span>
+        </div>
+        <div class="band-mmw">
+          <span class="band-range">&gt; 24 GHz</span>
+          <span class="band-name">mmWave</span>
+          <span class="band-note">Very wide bandwidth, fragile links</span>
+        </div>
+      </div>
+      <div class="spectrum-facts">
+        <p><strong>~10×</strong> more bandwidth than sub-6 GHz</p>
+        <p><strong>~2×</strong> the range of mmWave, with better wall penetration</p>
+        <p><strong>80%+</strong> of mobile data is consumed indoors, where FORMULA3 focuses</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Approach</p>
+      <h2>Measure. Model. Predict. Adapt.</h2>
+      <p>Reacting to a lost link is too late for AR/VR or tele-surgery. FORMULA3 makes the network proactive. It learns from real FR3 measurements, predicts outages before they happen, and reconfigures surfaces using context it senses from the channel itself.</p>
+    </div>
+    <ol class="loop">
+      <li>
+        <span class="step">01</span>
+        <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 19.1a10 10 0 0 1 0-14.2"/><path d="M7.8 16.2a6 6 0 0 1 0-8.4"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8a6 6 0 0 1 0 8.4"/><path d="M19.1 4.9a10 10 0 0 1 0 14.2"/></svg></div>
+        <h3>Measure</h3>
+        <p>Characterize dynamic FR3 channels on new hybrid RIS and reflector-array testbeds, indoors and outdoor-to-indoor.</p>
+      </li>
+      <li>
+        <span class="step">02</span>
+        <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 9 5-9 5-9-5 9-5z"/><path d="m3 12 9 5 9-5"/><path d="m3 17 9 5 9-5"/></svg></div>
+        <h3>Model</h3>
+        <p>Build validated channel models and generate rich datasets of mobility, occupancy, and layout dynamics.</p>
+      </li>
+      <li>
+        <span class="step">03</span>
+        <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 6-6"/><path d="M15 8h5v5" stroke-dasharray="2 2"/></svg></div>
+        <h3>Predict</h3>
+        <p>Use physics-informed AI to forecast channel gains and outages before they disrupt service.</p>
+      </li>
+      <li>
+        <span class="step">04</span>
+        <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 21v-5h5"/><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/></svg></div>
+        <h3>Adapt</h3>
+        <p>Reconfigure surfaces and reassign users using context sensed from the channel (ISAC), and keep learning as rooms change.</p>
+      </li>
+    </ol>
+    <p class="loop-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Every step is validated against measurements and simulation in a unified evaluation platform.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Research thrusts</p>
+      <h2>Four integrated thrusts</h2>
+      <p>Measurements feed the models, the models train the AI, and context sensing keeps the AI accurate in rooms it has never seen.</p>
+    </div>
+    <div class="thrusts">
+      <a class="thrust-card t1" href="{{ '/research/' | relative_url }}#t1">
+        <span class="tag">T1</span>
+        <h3>Channel characterization &amp; dataset generation</h3>
+        <p>A first-of-its-kind hybrid FR3 testbed with fabricated RIS panels and metallic reflector arrays, plus a calibrated simulation suite for dynamic data.</p>
+        <span class="more">Read more →</span>
+      </a>
+      <a class="thrust-card t2" href="{{ '/research/' | relative_url }}#t2">
+        <span class="tag">T2</span>
+        <h3>AI-native proactive resource management</h3>
+        <p>Physics-informed AI that predicts surface channels, excludes shadowed elements, and configures surfaces to suppress LoS/NLoS interference.</p>
+        <span class="more">Read more →</span>
+      </a>
+      <a class="thrust-card t3" href="{{ '/research/' | relative_url }}#t3">
+        <span class="tag">T3</span>
+        <h3>Generalization via ISAC &amp; continual learning</h3>
+        <p>Sensing occupancy, mobility, and layout from the channel itself to pick the right model, and retraining when the environment drifts.</p>
+        <span class="more">Read more →</span>
+      </a>
+      <a class="thrust-card t4" href="{{ '/research/' | relative_url }}#t4">
+        <span class="tag">T4</span>
+        <h3>Validation &amp; evaluation</h3>
+        <p>Benchmarking every model and strategy on a unified measurement and simulation platform under realistic, changing conditions.</p>
+        <span class="more">Read more →</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">What we are aiming for</p>
+      <h2>Project targets</h2>
+    </div>
+    <div class="targets">
+      <div class="target">
+        <div class="num">&lt;2<small>%</small></div>
+        <p>QoS degradation when AI models face dynamics they were not trained on</p>
+      </div>
+      <div class="target">
+        <div class="num">50<small>%</small></div>
+        <p>Less signaling overhead by excluding shadowed RIS and reflector elements</p>
+      </div>
+      <div class="target">
+        <div class="num">10<sup>4</sup><small>×</small></div>
+        <p>Lower channel-gain prediction error through physics-informed learning</p>
+      </div>
+      <div class="target">
+        <div class="num">10<small>×</small></div>
+        <p>QoS improvement by mitigating LoS/NLoS interference across hybrid surfaces</p>
+      </div>
+    </div>
+    <p class="targets-note">These are research goals set at the start of the project, not measured results. Results will be reported in <a href="{{ '/publications/' | relative_url }}">publications</a> as the work progresses.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Partners</p>
+      <h2>Five institutions, two countries</h2>
+      <p>FORMULA3 combines expertise in FR3 measurement, reconfigurable surfaces, reflector arrays, generalizable AI, and integrated sensing across the United States and Finland.</p>
+    </div>
+    {% include partners.html %}
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Updates</p>
+      <h2>Latest news</h2>
+    </div>
+    {% assign latest = site.news | sort: "date" | reverse %}
+    {% include news-list.html items=latest limit=3 %}
+    <p class="section-cta"><a class="btn btn-outline" href="{{ '/news/' | relative_url }}">All news →</a></p>
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="wrap">
+    <div class="funding-band">
+      <img src="{{ '/assets/img/logos/nsf.png' | relative_url }}" alt="U.S. National Science Foundation" width="64" height="64">
+      <p><strong>Funded through VINES, Verticals-enabling Intelligent Network Systems</strong>, a joint program of the U.S. National Science Foundation (Award Nos. {% for a in site.awards %}<a href="https://www.nsf.gov/awardsearch/show-award/?AWD_ID={{ a.number }}">{{ a.number }}</a>{% unless forloop.last %} and {% endunless %}{% endfor %}) and the Research Council of Finland. Project period: {{ site.project_period }}.</p>
+    </div>
+  </div>
+</section>

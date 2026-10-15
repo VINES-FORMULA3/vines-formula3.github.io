@@ -1,0 +1,9 @@
+<div class="partners">
+  {% for p in site.data.partners %}
+  <a class="partner" href="{{ p.url }}">
+    <span class="logo-tile"><img src="{{ '/assets/img/logos/' | append: p.logo | relative_url }}" alt="{{ p.name }} logo" loading="lazy"></span>
+    <span class="p-name">{{ p.name }}</span>
+    <span class="p-place">{{ p.city }} · {{ p.country }}</span>
+  </a>
+  {% endfor %}
+</div>

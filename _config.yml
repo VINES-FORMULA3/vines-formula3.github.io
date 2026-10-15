@@ -1,13 +1,55 @@
 title: FORMULA3
-theme: minima
+tagline: Framework for Optimal Resource Management Using Generalizable AI in FR3 Dynamic Programmable Wireless Environments
+description: >-
+  FORMULA3 is a joint NSF and Research Council of Finland VINES project building
+  AI-native, sensing-aware FR3 (7–24 GHz) programmable wireless environments that
+  keep 6G connectivity reliable under mobility, blockage, occupancy, and layout changes.
 
-header_pages:
-  - research.md
-  - team.md
-  - publications.md
-  - datasets.md
-  - news.md
+# The site is served from https://vines-formula3.github.io/website/
+url: https://vines-formula3.github.io
+baseurl: /website
+lang: en_US
+github_repo: https://github.com/VINES-FORMULA3/website
+
+permalink: pretty
+markdown: kramdown
+kramdown:
+  input: GFM
+
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+  - jekyll-redirect-from
 
 collections:
   news:
     output: true
+    permalink: /news/:year/:month/:title/
+
+defaults:
+  - scope: { path: "", type: pages }
+    values: { layout: page }
+  - scope: { path: "", type: news }
+    values: { layout: news }
+
+# Top navigation (order matters)
+nav:
+  - { title: Research, url: /research/ }
+  - { title: Team, url: /team/ }
+  - { title: Publications, url: /publications/ }
+  - { title: Datasets, url: /datasets/ }
+  - { title: Outreach, url: /outreach/ }
+  - { title: News, url: /news/ }
+
+# Funding (shown in the footer and on the home page)
+awards:
+  - { number: "2549087", institution: Tennessee Tech University }
+  - { number: "2549088", institution: Texas A&M University }
+project_period: October 2026 – September 2029
+
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+  - .jekyll-cache

@@ -1,0 +1,78 @@
+# Project milestones, in half-year periods from the October 2026 start.
+# span: [first, last] period (1-6), inclusive. thrust: 1-4 (sets the color).
+
+periods:
+  - { year: Year 1, half: H1, dates: Oct 2026 – Mar 2027 }
+  - { year: Year 1, half: H2, dates: Apr 2027 – Sep 2027 }
+  - { year: Year 2, half: H1, dates: Oct 2027 – Mar 2028 }
+  - { year: Year 2, half: H2, dates: Apr 2028 – Sep 2028 }
+  - { year: Year 3, half: H1, dates: Oct 2028 – Mar 2029 }
+  - { year: Year 3, half: H2, dates: Apr 2029 – Sep 2029 }
+
+tasks:
+  - id: T1.1
+    thrust: 1
+    name: FR3 hybrid testbeds and channel characterization
+    lead: Ekin (TAMU), Rappaport (NYU)
+    deliverable: FR3 hybrid PWE testbeds at Texas A&M and Tampere; channel data and models
+    span: [1, 2]
+  - id: T1.2
+    thrust: 1
+    name: Dynamic simulation platform and data generation
+    lead: Ekin, Abdelhadi (TAMU)
+    deliverable: Dynamic channel-gain data and models with environment labels
+    span: [2, 3]
+  - id: T2.1
+    thrust: 2
+    name: Energy-efficient surface channel prediction
+    lead: Ismail (Tennessee Tech)
+    deliverable: AI model for surface channel prediction
+    span: [3, 4]
+  - id: T2.2
+    thrust: 2
+    name: Dynamic exclusion of shadowed surface elements
+    lead: Ismail (Tennessee Tech)
+    deliverable: Exclusion strategy balancing outage, signaling, and energy
+    span: [4, 5]
+  - id: T2.3
+    thrust: 2
+    name: Interference-aware user assignment and surface configuration
+    lead: Basar (Tampere)
+    deliverable: Assignment and configuration policies that improve QoS
+    span: [5, 6]
+  - id: T3.1
+    thrust: 3
+    name: ISAC framework for context-aware AI selection
+    lead: Wichman (Aalto)
+    deliverable: ISAC-based framework for adaptive AI-driven resource management
+    span: [4, 5]
+  - id: T3.2
+    thrust: 3
+    name: Continual learning under concept drift
+    lead: Ismail (Tennessee Tech)
+    deliverable: Transfer-learning-based continual adaptation framework
+    span: [4, 5]
+  - id: T4.1
+    thrust: 4
+    name: Validate channel models and generated data
+    lead: Ekin (TAMU), Rappaport (NYU)
+    deliverable: Statistical benchmarking of synthetic vs. measured data
+    span: [2, 4]
+  - id: T4.2
+    thrust: 4
+    name: Evaluate proactive resource management
+    lead: Basar (Tampere)
+    deliverable: MSE, delay, QoS, overhead, and convergence metrics
+    span: [3, 6]
+  - id: T4.3
+    thrust: 4
+    name: Evaluate ISAC and continual learning
+    lead: Wichman (Aalto)
+    deliverable: Accuracy, latency, recovery, and robustness metrics
+    span: [4, 6]
+  - id: T4.4
+    thrust: 4
+    name: End-to-end FORMULA3 evaluation
+    lead: Ismail (Tennessee Tech)
+    deliverable: Throughput, latency, and QoS-consistency metrics
+    span: [5, 6]

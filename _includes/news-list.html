@@ -1,0 +1,18 @@
+{% assign limit = include.limit | default: 1000 %}
+{% if include.items.size > 0 %}
+<ul class="news-list">
+  {% for post in include.items limit: limit %}
+  <li class="news-item">
+    <a href="{{ post.url | relative_url }}">
+      <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%b %-d, %Y" }}</time>
+      <div>
+        <h3>{{ post.title }}</h3>
+        <p>{% if post.summary %}{{ post.summary }}{% else %}{{ post.excerpt | strip_html | truncatewords: 32 }}{% endif %}</p>
+      </div>
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<div class="empty-state"><p>No news yet.</p></div>
+{% endif %}
