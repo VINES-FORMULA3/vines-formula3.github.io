@@ -23,16 +23,17 @@
 
     <div class="footer-funding">
       <h2>Funding</h2>
-      <div class="funding-row">
-        <img src="{{ '/assets/img/logos/nsf.png' | relative_url }}" alt="U.S. National Science Foundation" width="56" height="56" loading="lazy">
-        <p>
+      <div class="funding-logos">
+        <a href="https://www.nsf.gov/"><img src="{{ '/assets/img/logos/nsf.png' | relative_url }}" alt="U.S. National Science Foundation" width="56" height="56" loading="lazy"></a>
+        <a href="https://www.aka.fi/en/"><img class="rcf" src="{{ '/assets/img/logos/rcf-white.svg' | relative_url }}" alt="Research Council of Finland" width="147" height="40" loading="lazy"></a>
+      </div>
+      <p>
           Supported by the U.S. National Science Foundation under Award Nos.
           {% for a in site.awards %}<a href="https://www.nsf.gov/awardsearch/show-award/?AWD_ID={{ a.number }}">{{ a.number }}</a>{% unless forloop.last %} and {% endunless %}{% endfor %},
           and by the Research Council of Finland under Decision Nos.
           {% for a in site.rcf_awards %}<a href="{{ a.url }}">{{ a.number }}</a>{% unless forloop.last %} and {% endunless %}{% endfor %},
           through the joint VINES program.
         </p>
-      </div>
       <p class="disclaimer">Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Science Foundation or the Research Council of Finland.</p>
     </div>
   </div>
