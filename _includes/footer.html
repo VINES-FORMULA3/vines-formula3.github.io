@@ -28,7 +28,9 @@
         <p>
           Supported by the U.S. National Science Foundation under Award Nos.
           {% for a in site.awards %}<a href="https://www.nsf.gov/awardsearch/show-award/?AWD_ID={{ a.number }}">{{ a.number }}</a>{% unless forloop.last %} and {% endunless %}{% endfor %},
-          and by the Research Council of Finland, through the joint VINES program.
+          and by the Research Council of Finland under Decision Nos.
+          {% for a in site.rcf_awards %}<a href="{{ a.url }}">{{ a.number }}</a>{% unless forloop.last %} and {% endunless %}{% endfor %},
+          through the joint VINES program.
         </p>
       </div>
       <p class="disclaimer">Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Science Foundation or the Research Council of Finland.</p>
