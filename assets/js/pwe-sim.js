@@ -215,7 +215,14 @@
       var cx = X(hit.x), cy = Y(hit.y), r = 4 * dpr;
       ctx.beginPath(); ctx.moveTo(cx - r, cy - r); ctx.lineTo(cx + r, cy + r); ctx.moveTo(cx + r, cy - r); ctx.lineTo(cx - r, cy + r); ctx.stroke();
       ctx.restore();
-      label('−' + band.block * world.losCount + ' dB', hit.x + 0.22, hit.y - 0.28, 'left', sev);
+      var nx = -dy / len, ny = dx / len;
+      if (ny > 0) { nx = -nx; ny = -ny; }
+      var lx = hit.x + nx * 0.4, ly = hit.y + ny * 0.4;
+      var du = Math.hypot(lx - u.x, ly - u.y);
+      if (du < 1.1) { var back = 1.1 - du + 0.25; lx -= dx / len * back; ly -= dy / len * back; }
+      lx = clamp(lx, WALL + 0.4, W - WALL - 0.4);
+      ly = clamp(ly, WALL + 0.7, H - WALL - 0.3);
+      label('−' + band.block * world.losCount + ' dB', lx, ly, nx >= 0 ? 'left' : 'right', sev);
     } else {
       line([AP, u], '#fbbf24', 1.6, 0.55);
     }

@@ -1,4 +1,4 @@
-<svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+<svg class="brand-mark" width="34" height="34" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
   <defs>
     <linearGradient id="{{ include.id | default: 'bm-g' }}" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#14b8a6"/>
