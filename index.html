@@ -80,7 +80,7 @@ scripts:
           <p class="sim-takeaway" data-sim="takeaway"></p>
 
           <table class="sim-compare">
-            <caption>Time below 2 Gbps in this 2-minute scenario <span>· lower is better · tap to view</span></caption>
+            <caption>Time below 2 Gbps over 2 minutes <span>· tap a cell to view</span></caption>
             <thead>
               <tr>
                 <th scope="col">Band</th>
@@ -93,27 +93,28 @@ scripts:
             <tbody>
               <tr>
                 <th scope="row">Sub-6<small>3.5 GHz</small></th>
-                <td><button type="button" class="cmp-cell" data-sim-cell="sub6-none" aria-pressed="false"><span class="sr-only">Sub-6, no surfaces: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
-                <td><button type="button" class="cmp-cell" data-sim-cell="sub6-ris" aria-pressed="false"><span class="sr-only">Sub-6, RIS only: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
-                <td><button type="button" class="cmp-cell" data-sim-cell="sub6-mra" aria-pressed="false"><span class="sr-only">Sub-6, MRA only: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
-                <td><button type="button" class="cmp-cell" data-sim-cell="sub6-both" aria-pressed="false"><span class="sr-only">Sub-6, RIS and MRA: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
+                <td><button type="button" class="cmp-cell" data-sim-cell="sub6-none" aria-pressed="false"><span class="sr-only">Sub-6, no surfaces: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span><span class="cbar" aria-hidden="true"><span class="ok"></span><span class="below"></span></span></button></td>
+                <td><button type="button" class="cmp-cell" data-sim-cell="sub6-ris" aria-pressed="false"><span class="sr-only">Sub-6, RIS only: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span><span class="cbar" aria-hidden="true"><span class="ok"></span><span class="below"></span></span></button></td>
+                <td><button type="button" class="cmp-cell" data-sim-cell="sub6-mra" aria-pressed="false"><span class="sr-only">Sub-6, MRA only: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span><span class="cbar" aria-hidden="true"><span class="ok"></span><span class="below"></span></span></button></td>
+                <td><button type="button" class="cmp-cell" data-sim-cell="sub6-both" aria-pressed="false"><span class="sr-only">Sub-6, RIS and MRA: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span><span class="cbar" aria-hidden="true"><span class="ok"></span><span class="below"></span></span></button></td>
               </tr>
               <tr>
                 <th scope="row">FR3<small>15 GHz</small></th>
-                <td><button type="button" class="cmp-cell" data-sim-cell="fr3-none" aria-pressed="false"><span class="sr-only">FR3, no surfaces: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
-                <td><button type="button" class="cmp-cell" data-sim-cell="fr3-ris" aria-pressed="false"><span class="sr-only">FR3, RIS only: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
-                <td><button type="button" class="cmp-cell" data-sim-cell="fr3-mra" aria-pressed="false"><span class="sr-only">FR3, MRA only: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
-                <td><button type="button" class="cmp-cell" data-sim-cell="fr3-both" aria-pressed="false"><span class="sr-only">FR3, RIS and MRA: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
+                <td><button type="button" class="cmp-cell" data-sim-cell="fr3-none" aria-pressed="false"><span class="sr-only">FR3, no surfaces: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span><span class="cbar" aria-hidden="true"><span class="ok"></span><span class="below"></span></span></button></td>
+                <td><button type="button" class="cmp-cell" data-sim-cell="fr3-ris" aria-pressed="false"><span class="sr-only">FR3, RIS only: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span><span class="cbar" aria-hidden="true"><span class="ok"></span><span class="below"></span></span></button></td>
+                <td><button type="button" class="cmp-cell" data-sim-cell="fr3-mra" aria-pressed="false"><span class="sr-only">FR3, MRA only: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span><span class="cbar" aria-hidden="true"><span class="ok"></span><span class="below"></span></span></button></td>
+                <td><button type="button" class="cmp-cell" data-sim-cell="fr3-both" aria-pressed="false"><span class="sr-only">FR3, RIS and MRA: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span><span class="cbar" aria-hidden="true"><span class="ok"></span><span class="below"></span></span></button></td>
               </tr>
               <tr>
                 <th scope="row">mmWave<small>28 GHz</small></th>
-                <td><button type="button" class="cmp-cell" data-sim-cell="mmw-none" aria-pressed="false"><span class="sr-only">mmWave, no surfaces: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
-                <td><button type="button" class="cmp-cell" data-sim-cell="mmw-ris" aria-pressed="false"><span class="sr-only">mmWave, RIS only: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
-                <td><button type="button" class="cmp-cell" data-sim-cell="mmw-mra" aria-pressed="false"><span class="sr-only">mmWave, MRA only: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
-                <td><button type="button" class="cmp-cell" data-sim-cell="mmw-both" aria-pressed="false"><span class="sr-only">mmWave, RIS and MRA: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
+                <td><button type="button" class="cmp-cell" data-sim-cell="mmw-none" aria-pressed="false"><span class="sr-only">mmWave, no surfaces: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span><span class="cbar" aria-hidden="true"><span class="ok"></span><span class="below"></span></span></button></td>
+                <td><button type="button" class="cmp-cell" data-sim-cell="mmw-ris" aria-pressed="false"><span class="sr-only">mmWave, RIS only: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span><span class="cbar" aria-hidden="true"><span class="ok"></span><span class="below"></span></span></button></td>
+                <td><button type="button" class="cmp-cell" data-sim-cell="mmw-mra" aria-pressed="false"><span class="sr-only">mmWave, MRA only: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span><span class="cbar" aria-hidden="true"><span class="ok"></span><span class="below"></span></span></button></td>
+                <td><button type="button" class="cmp-cell" data-sim-cell="mmw-both" aria-pressed="false"><span class="sr-only">mmWave, RIS and MRA: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span><span class="cbar" aria-hidden="true"><span class="ok"></span><span class="below"></span></span></button></td>
               </tr>
             </tbody>
           </table>
+          <p class="cmp-legend" aria-hidden="true"><span><i class="ok"></i>Meets 2 Gbps</span><span><i class="below"></i>Below 2 Gbps (shorter is better)</span></p>
         </div>
 
         <div class="lab-timeline">
