@@ -39,15 +39,22 @@ scripts:
           </div>
         </fieldset>
         <fieldset class="seg">
-          <legend>RIS + MRA surfaces</legend>
+          <legend>RIS</legend>
           <div class="seg-opts">
-          <label><input type="radio" name="sim-surf" value="on" checked><span>On</span></label>
-          <label><input type="radio" name="sim-surf" value="off"><span>Off</span></label>
+          <label><input type="radio" name="sim-ris" value="on" checked><span>On</span></label>
+          <label><input type="radio" name="sim-ris" value="off"><span>Off</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="seg">
+          <legend>MRA</legend>
+          <div class="seg-opts">
+          <label><input type="radio" name="sim-mra" value="on" checked><span>On</span></label>
+          <label><input type="radio" name="sim-mra" value="off"><span>Off</span></label>
           </div>
         </fieldset>
       </div>
       <div class="sim-canvas-wrap">
-        <canvas id="pwe-sim" role="img" aria-label="Animated top view of a room. An access point reaches a moving user directly and, when surfaces are on, through RIS tiles on one wall and a metallic reflector array on another. People walking through the room block paths; shadowed tiles are excluded and beams are steered toward the user's predicted position."></canvas>
+        <canvas id="pwe-sim" role="img" aria-label="Animated top view of a room. An access point reaches a moving user directly and, when switched on, through RIS tiles on one wall and a metallic reflector array on another. People walking through the room block paths; shadowed tiles are excluded and beams are steered toward the user's predicted position."></canvas>
         <p class="sim-fallback">An interactive illustration of a programmable wireless environment appears here when JavaScript is enabled.</p>
       </div>
       <div class="sim-perf">
@@ -62,34 +69,42 @@ scripts:
       </div>
       <div class="sim-compare-wrap">
         <table class="sim-compare">
-          <caption>Share of time at ≥ 2 Gbps · same people, same moves for every option · simulated <span data-sim="elapsed">0:00</span></caption>
+          <caption>Share of time at ≥ 2 Gbps (bars) and average rate · same people and moves for every option · simulated <span data-sim="elapsed">0:00</span></caption>
           <thead>
             <tr>
               <th scope="col">Band</th>
-              <th scope="col"><i class="key off"></i>Surfaces off</th>
-              <th scope="col"><i class="key on"></i>Surfaces on</th>
+              <th scope="col">None</th>
+              <th scope="col">RIS</th>
+              <th scope="col">MRA</th>
+              <th scope="col">RIS + MRA</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <th scope="row">Sub-6 GHz<small>3.5 GHz</small></th>
-              <td><button type="button" class="cmp-cell" data-sim-cell="sub6-off" aria-pressed="false"><span class="sr-only">Sub-6 GHz, surfaces off: </span><span class="track"><span class="fill off"></span></span><span class="pct">–</span><span class="avg"></span></button></td>
-              <td><button type="button" class="cmp-cell" data-sim-cell="sub6-on" aria-pressed="false"><span class="sr-only">Sub-6 GHz, surfaces on: </span><span class="track"><span class="fill on"></span></span><span class="pct">–</span><span class="avg"></span></button></td>
+              <td><button type="button" class="cmp-cell" data-sim-cell="sub6-none" aria-pressed="false"><span class="sr-only">Sub-6 GHz, No surfaces: </span><span class="track"><span class="fill"></span></span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
+              <td><button type="button" class="cmp-cell" data-sim-cell="sub6-ris" aria-pressed="false"><span class="sr-only">Sub-6 GHz, RIS only: </span><span class="track"><span class="fill"></span></span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
+              <td><button type="button" class="cmp-cell" data-sim-cell="sub6-mra" aria-pressed="false"><span class="sr-only">Sub-6 GHz, MRA only: </span><span class="track"><span class="fill"></span></span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
+              <td><button type="button" class="cmp-cell" data-sim-cell="sub6-both" aria-pressed="false"><span class="sr-only">Sub-6 GHz, RIS and MRA: </span><span class="track"><span class="fill"></span></span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
             </tr>
             <tr>
               <th scope="row">FR3<small>15 GHz</small></th>
-              <td><button type="button" class="cmp-cell" data-sim-cell="fr3-off" aria-pressed="false"><span class="sr-only">FR3, surfaces off: </span><span class="track"><span class="fill off"></span></span><span class="pct">–</span><span class="avg"></span></button></td>
-              <td><button type="button" class="cmp-cell" data-sim-cell="fr3-on" aria-pressed="false"><span class="sr-only">FR3, surfaces on: </span><span class="track"><span class="fill on"></span></span><span class="pct">–</span><span class="avg"></span></button></td>
+              <td><button type="button" class="cmp-cell" data-sim-cell="fr3-none" aria-pressed="false"><span class="sr-only">FR3, No surfaces: </span><span class="track"><span class="fill"></span></span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
+              <td><button type="button" class="cmp-cell" data-sim-cell="fr3-ris" aria-pressed="false"><span class="sr-only">FR3, RIS only: </span><span class="track"><span class="fill"></span></span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
+              <td><button type="button" class="cmp-cell" data-sim-cell="fr3-mra" aria-pressed="false"><span class="sr-only">FR3, MRA only: </span><span class="track"><span class="fill"></span></span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
+              <td><button type="button" class="cmp-cell" data-sim-cell="fr3-both" aria-pressed="false"><span class="sr-only">FR3, RIS and MRA: </span><span class="track"><span class="fill"></span></span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
             </tr>
             <tr>
               <th scope="row">mmWave<small>28 GHz</small></th>
-              <td><button type="button" class="cmp-cell" data-sim-cell="mmw-off" aria-pressed="false"><span class="sr-only">mmWave, surfaces off: </span><span class="track"><span class="fill off"></span></span><span class="pct">–</span><span class="avg"></span></button></td>
-              <td><button type="button" class="cmp-cell" data-sim-cell="mmw-on" aria-pressed="false"><span class="sr-only">mmWave, surfaces on: </span><span class="track"><span class="fill on"></span></span><span class="pct">–</span><span class="avg"></span></button></td>
+              <td><button type="button" class="cmp-cell" data-sim-cell="mmw-none" aria-pressed="false"><span class="sr-only">mmWave, No surfaces: </span><span class="track"><span class="fill"></span></span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
+              <td><button type="button" class="cmp-cell" data-sim-cell="mmw-ris" aria-pressed="false"><span class="sr-only">mmWave, RIS only: </span><span class="track"><span class="fill"></span></span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
+              <td><button type="button" class="cmp-cell" data-sim-cell="mmw-mra" aria-pressed="false"><span class="sr-only">mmWave, MRA only: </span><span class="track"><span class="fill"></span></span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
+              <td><button type="button" class="cmp-cell" data-sim-cell="mmw-both" aria-pressed="false"><span class="sr-only">mmWave, RIS and MRA: </span><span class="track"><span class="fill"></span></span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
             </tr>
           </tbody>
         </table>
       </div>
-      <figcaption id="sim-caption" class="sim-caption">Illustrative model, not measurements. A person in the way costs about 4 dB at sub-6, 16 dB at FR3, and 28 dB at mmWave, while bandwidth grows with frequency. Grey dots are people; crossed tiles are shadowed and excluded. Tap a table cell to switch views.</figcaption>
+      <figcaption id="sim-caption" class="sim-caption">Illustrative model, not measurements. The model assumes a person in the way costs about 4 dB at sub-6, 16 dB at FR3, and 28 dB at mmWave, and that bandwidth grows with frequency. Grey dots are people; crossed tiles are shadowed and excluded. Tap a table cell to switch views.</figcaption>
     </figure>
   </div>
 </section>

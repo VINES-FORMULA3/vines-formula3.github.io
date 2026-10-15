@@ -18,6 +18,7 @@ Most updates mean editing one file. You can do it in the GitHub web editor.
 | Datasets | `_data/datasets.yml` | Set `status: released` and fill in `link` (plus `doi` and `license`) when a dataset goes public. |
 | Timeline | `_data/timeline.yml` | `span: [start, end]` in half-year periods 1–6. |
 | Partners | `_data/partners.yml` | Logos in `assets/img/logos/`. |
+| Hero animation assumptions | `assets/js/pwe-model.js` → `BANDS` (bandwidth, blockage loss per person, surface losses); target line in `assets/js/pwe-sim.js` → `TARGET` | Illustrative model, not measurements. |
 | Funding text | `_config.yml` → `awards` (NSF) and `rcf_awards` (Research Council of Finland), plus `_includes/footer.html` | |
 
 Longer pages (`research.html`, `outreach.html`, `index.html`) are HTML with a small front-matter header.
@@ -31,7 +32,7 @@ _news/               news posts (Markdown)
 _layouts/            default, page, news
 _includes/           header, footer, and reusable blocks (Gantt chart, person card, …)
 assets/css/site.css  all styles (light and dark mode)
-assets/js/           mobile menu, and the hero animation (pwe-sim.js)
+assets/js/           site.js (mobile menu), pwe-model.js (hero link model), pwe-sim.js (hero animation and controls)
 index.html, research.html, team.html, publications.html, datasets.html, outreach.html, news.html
 ```
 

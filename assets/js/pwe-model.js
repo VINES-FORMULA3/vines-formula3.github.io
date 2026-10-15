@@ -144,14 +144,14 @@
       world.losBlocker = los.first;
     };
 
-    // Link quality for one band, with or without programmable surfaces
-    world.evaluate = function (band, surfacesOn) {
+    // Link quality for one band, with the RIS and/or the MRA switched on
+    world.evaluate = function (band, risOn, mraOn) {
       var u = world.user;
       var base = band.s1m - 20 * Math.log10(Math.max(1, hyp(AP, u)));
       var losDb = base - world.losCount * band.block;
       var lin = db2lin(losDb) + db2lin(base + band.nlos);
       var risDb = null, mraDb = null;
-      if (surfacesOn) {
+      if (risOn) {
         var ds = [];
         tiles.forEach(function (tl) { if (!tl.blocked) ds.push(tl.d); });
         ds.sort(function (a, b) { return a - b; });
@@ -160,6 +160,8 @@
           risDb = band.s1m - 20 * Math.log10(ds[0]) + band.ris + 10 * Math.log10(k);
           lin += db2lin(risDb);
         }
+      }
+      if (mraOn) {
         if (world.bestMra !== null) {
           mraDb = band.s1m - 20 * Math.log10(mra[world.bestMra].d) + band.mra;
           lin += db2lin(mraDb);

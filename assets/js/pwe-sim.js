@@ -1,6 +1,6 @@
 // Home-page hero: an interactive, illustrative view of a dynamic programmable
-// wireless environment. Pick a band (sub-6, FR3, mmWave) and turn the RIS/MRA
-// surfaces on or off; every option runs on the same moving people, so the
+// wireless environment. Pick a band (sub-6, FR3, mmWave) and switch the RIS and
+// the MRA on or off; every option runs on the same moving people, so the
 // comparison table is like-for-like. The link model lives in pwe-model.js.
 (function () {
   var M = window.PWEModel;
@@ -16,20 +16,25 @@
   var TARGET = 2;    // Gbps: a multi-Gbps service target
   var YMAX = 8;      // Gbps: sparkline scale, shared by all options
   var HIST_N = 200;  // 20 s of history at 10 samples/s
-  var SERIES = { off: '#3987e5', on: '#199e70' };
+  var SERIES_COLOR = '#199e70';
   var CONE = { sub6: 0.55, fr3: 0.24, mmw: 0.1 }; // AP beam half-width (rad), for the picture only
 
   var world = M.createWorld();
   var bands = {};
   M.BANDS.forEach(function (b) { bands[b.key] = b; });
+  var COMBOS = [
+    { id: 'none', ris: false, mra: false }, { id: 'ris', ris: true, mra: false },
+    { id: 'mra', ris: false, mra: true }, { id: 'both', ris: true, mra: true }
+  ];
+  function comboId(ris, mra) { return ris ? (mra ? 'both' : 'ris') : (mra ? 'mra' : 'none'); }
   var configs = [];
   M.BANDS.forEach(function (b) {
-    [false, true].forEach(function (on) { configs.push({ key: b.key + (on ? '-on' : '-off'), band: b, on: on }); });
+    COMBOS.forEach(function (c) { configs.push({ key: b.key + '-' + c.id, band: b, ris: c.ris, mra: c.mra }); });
   });
   var stats = {}, hist = {}, evals = {};
   configs.forEach(function (c) { stats[c.key] = { t: 0, ok: 0, sum: 0 }; hist[c.key] = []; });
-  var sel = { band: 'fr3', on: true };
-  function selKey() { return sel.band + (sel.on ? '-on' : '-off'); }
+  var sel = { band: 'fr3', ris: true, mra: true };
+  function selKey() { return sel.band + '-' + comboId(sel.ris, sel.mra); }
 
   var tileGlow = world.tiles.map(function () { return 0.3; });
   var mraGlow = world.mra.map(function () { return 0.3; });
@@ -41,7 +46,7 @@
   function tick(dt) {
     world.step(dt);
     configs.forEach(function (c) {
-      var e = world.evaluate(c.band, c.on);
+      var e = world.evaluate(c.band, c.ris, c.mra);
       evals[c.key] = e;
       var s = stats[c.key];
       s.t += dt; s.sum += e.rate * dt;
@@ -60,11 +65,11 @@
     phase = (phase + dt * (0.12 + cur.rate / 6)) % 1;
     var ease = Math.min(1, dt * 6);
     world.tiles.forEach(function (tl, i) {
-      var target = !sel.on || tl.blocked ? 0 : world.best.indexOf(i) >= 0 ? 1 : 0.38;
+      var target = !sel.ris || tl.blocked ? 0 : world.best.indexOf(i) >= 0 ? 1 : 0.38;
       tileGlow[i] += (target - tileGlow[i]) * ease;
     });
     world.mra.forEach(function (m, i) {
-      var target = !sel.on || m.blocked ? 0 : i === world.bestMra ? 1 : 0.38;
+      var target = !sel.mra || m.blocked ? 0 : i === world.bestMra ? 1 : 0.38;
       mraGlow[i] += (target - mraGlow[i]) * ease;
     });
   }
@@ -207,7 +212,7 @@
     }
 
     var paths = [{ share: losShare, pts: [AP, u], color: '#fde68a' }];
-    if (sel.on) {
+    if (sel.ris) {
       world.best.forEach(function (idx, rank) {
         var tl = world.tiles[idx];
         var pts = [AP, { x: tl.x, y: tl.y + 0.12 }, u];
@@ -218,6 +223,8 @@
         var top = world.tiles[world.best[0]];
         line([{ x: top.x, y: top.y + 0.12 }, q], 'rgba(45,212,191,.45)', 1.2, 1, [3, 5]);
       }
+    }
+    if (sel.mra) {
       if (world.bestMra !== null) {
         var m = world.mra[world.bestMra];
         var mp = [AP, { x: m.x - 0.1, y: m.y }, u];
@@ -227,13 +234,13 @@
     }
     // Data packets flow along the strongest path, faster when the rate is higher
     paths.sort(function (a, c) { return c.share - a.share; });
-    if (e.rate > 0.05) packets(paths[0].pts, paths[0].color);
+    if (e.rate >= TARGET / 4 && paths[0].share > 0.05) packets(paths[0].pts, paths[0].color);
 
     // RIS tiles
     var tw = 7.5 / (world.NT - 1) * 0.78;
     world.tiles.forEach(function (tl, i) {
       var x = X(tl.x - tw / 2), y = Y(tl.y - 0.07), w = S(tw), h = S(0.2);
-      if (!sel.on) {
+      if (!sel.ris) {
         ctx.strokeStyle = 'rgba(148,163,184,.35)'; ctx.lineWidth = 1;
         ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
       } else if (tl.blocked) {
@@ -250,14 +257,14 @@
         ctx.restore();
       }
     });
-    label(sel.on ? 'RIS tiles' : 'RIS tiles · off', 1.08, WALL + 0.52, 'left', sel.on ? 'rgba(94,234,212,.85)' : 'rgba(148,163,184,.7)');
+    label(sel.ris ? 'RIS tiles' : 'RIS tiles · off', 1.08, WALL + 0.52, 'left', sel.ris ? 'rgba(94,234,212,.85)' : 'rgba(148,163,184,.7)');
 
     // MRA slats
     world.mra.forEach(function (m, i) {
       ctx.save();
       ctx.translate(X(m.x), Y(m.y));
       ctx.rotate(-0.5);
-      if (!sel.on) ctx.fillStyle = 'rgba(148,163,184,.3)';
+      if (!sel.mra) ctx.fillStyle = 'rgba(148,163,184,.3)';
       else if (m.blocked) ctx.fillStyle = '#2a2f45';
       else {
         ctx.shadowColor = '#a78bfa';
@@ -267,7 +274,7 @@
       ctx.fillRect(-S(0.05), -S(0.28), S(0.1), S(0.56));
       ctx.restore();
     });
-    label(sel.on ? 'MRA' : 'MRA · off', W - WALL - 0.42, 1.45, 'right', sel.on ? 'rgba(196,181,253,.85)' : 'rgba(148,163,184,.7)');
+    label(sel.mra ? 'MRA' : 'MRA · off', W - WALL - 0.42, 1.45, 'right', sel.mra ? 'rgba(196,181,253,.85)' : 'rgba(148,163,184,.7)');
 
     // People
     world.people.forEach(function (p) {
@@ -278,7 +285,7 @@
       ctx.fillStyle = '#94a3b8'; ctx.fill();
     });
 
-    if (sel.on) {
+    if (sel.ris) {
       ctx.save();
       ctx.setLineDash([3 * dpr, 4 * dpr]);
       ctx.strokeStyle = 'rgba(255,255,255,.5)';
@@ -315,7 +322,7 @@
     if (!sctx) return;
     var w = spark.width, h = spark.height, padT = 14 * dpr, padB = 4 * dpr;
     var data = hist[selKey()];
-    var color = sel.on ? SERIES.on : SERIES.off;
+    var color = SERIES_COLOR;
     sctx.clearRect(0, 0, w, h);
     function yv(v) { return padT + (h - padT - padB) * (1 - Math.min(v, YMAX) / YMAX); }
     function xi(i) { return w - (data.length - 1 - i) * (w / (HIST_N - 1)); }
@@ -399,7 +406,7 @@
     var e = evals[selKey()];
     var band = bands[sel.band];
     if (el.rate) el.rate.textContent = e.rate >= 1 ? e.rate.toFixed(1) : e.rate.toFixed(2);
-    if (el.config) el.config.textContent = band.label + ' (' + band.carrier + ') · surfaces ' + (sel.on ? 'on' : 'off') + ' · ' + (e.rate >= TARGET ? 'meets' : 'below') + ' target';
+    if (el.config) el.config.textContent = band.label + ' (' + band.carrier + ') · RIS ' + (sel.ris ? 'on' : 'off') + ' · MRA ' + (sel.mra ? 'on' : 'off') + ' · ' + (e.rate >= TARGET ? 'meets' : 'below') + ' target';
     var t = stats[configs[0].key].t;
     if (el.elapsed) el.elapsed.textContent = Math.floor(t / 60) + ':' + ('0' + Math.floor(t % 60)).slice(-2);
     el.cells.forEach(function (cell) {
@@ -408,16 +415,21 @@
       var pct = s.ok / s.t;
       cell.querySelector('.fill').style.width = (pct * 100).toFixed(1) + '%';
       cell.querySelector('.pct').textContent = Math.round(pct * 100) + '%';
-      cell.querySelector('.avg').textContent = (s.sum / s.t).toFixed(1) + ' Gbps avg';
+      var avg = (s.sum / s.t).toFixed(1);
+      cell.querySelector('.avg').textContent = avg + ' Gbps';
+      cell.title = cell.querySelector('.sr-only').textContent.replace(/: $/, '') + ': ' + Math.round(pct * 100) + '% of the time at ≥ ' + TARGET + ' Gbps, ' + avg + ' Gbps on average';
     });
   }
 
-  function select(band, on) {
-    sel.band = band; sel.on = on;
-    var r1 = document.querySelector('input[name="sim-band"][value="' + band + '"]');
-    var r2 = document.querySelector('input[name="sim-surf"][value="' + (on ? 'on' : 'off') + '"]');
-    if (r1) r1.checked = true;
-    if (r2) r2.checked = true;
+  function check(name, value) {
+    var r = document.querySelector('input[name="' + name + '"][value="' + value + '"]');
+    if (r) r.checked = true;
+  }
+  function select(band, ris, mra) {
+    sel.band = band; sel.ris = ris; sel.mra = mra;
+    check('sim-band', band);
+    check('sim-ris', ris ? 'on' : 'off');
+    check('sim-mra', mra ? 'on' : 'off');
     el.cells.forEach(function (cell) {
       cell.setAttribute('aria-pressed', String(cell.getAttribute('data-sim-cell') === selKey()));
     });
@@ -425,15 +437,18 @@
     updateUi(true);
   }
   Array.prototype.forEach.call(document.querySelectorAll('input[name="sim-band"]'), function (inp) {
-    inp.addEventListener('change', function () { if (inp.checked) select(inp.value, sel.on); });
+    inp.addEventListener('change', function () { if (inp.checked) select(inp.value, sel.ris, sel.mra); });
   });
-  Array.prototype.forEach.call(document.querySelectorAll('input[name="sim-surf"]'), function (inp) {
-    inp.addEventListener('change', function () { if (inp.checked) select(sel.band, inp.value === 'on'); });
+  Array.prototype.forEach.call(document.querySelectorAll('input[name="sim-ris"]'), function (inp) {
+    inp.addEventListener('change', function () { if (inp.checked) select(sel.band, inp.value === 'on', sel.mra); });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('input[name="sim-mra"]'), function (inp) {
+    inp.addEventListener('change', function () { if (inp.checked) select(sel.band, sel.ris, inp.value === 'on'); });
   });
   el.cells.forEach(function (cell) {
     cell.addEventListener('click', function () {
       var k = cell.getAttribute('data-sim-cell').split('-');
-      select(k[0], k[1] === 'on');
+      select(k[0], k[1] === 'ris' || k[1] === 'both', k[1] === 'mra' || k[1] === 'both');
     });
   });
 
@@ -445,7 +460,7 @@
 
   // Warm up: two simulated minutes so the chart and table start out meaningful
   for (var s = 0; s < 2400; s++) tick(0.05);
-  select(sel.band, sel.on);
+  select(sel.band, sel.ris, sel.mra);
 
   if (reduceMotion) {
     drawRoom(); drawSpark();
