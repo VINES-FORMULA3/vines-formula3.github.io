@@ -59,7 +59,7 @@ scripts:
             <fieldset class="seg">
               <legend>Band</legend>
               <div class="seg-opts">
-                <label><input type="radio" name="sim-band" value="sub6"><span>Sub-6</span></label>
+                <label><input type="radio" name="sim-band" value="sub6"><span>Sub-7</span></label>
                 <label><input type="radio" name="sim-band" value="fr3" checked><span>FR3</span></label>
                 <label><input type="radio" name="sim-band" value="mmw"><span>mmWave</span></label>
               </div>
@@ -101,11 +101,11 @@ scripts:
             </thead>
             <tbody>
               <tr>
-                <th scope="row">Sub-6<small>3.5 GHz</small></th>
-                <td><button type="button" class="cmp-cell" data-sim-cell="sub6-none" aria-pressed="false"><span class="sr-only">Sub-6, no surfaces: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span><span class="cbar" aria-hidden="true"><span class="ok"></span><span class="below"></span></span></button></td>
-                <td><button type="button" class="cmp-cell" data-sim-cell="sub6-ris" aria-pressed="false"><span class="sr-only">Sub-6, RIS only: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span><span class="cbar" aria-hidden="true"><span class="ok"></span><span class="below"></span></span></button></td>
-                <td><button type="button" class="cmp-cell" data-sim-cell="sub6-mra" aria-pressed="false"><span class="sr-only">Sub-6, MRA only: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span><span class="cbar" aria-hidden="true"><span class="ok"></span><span class="below"></span></span></button></td>
-                <td><button type="button" class="cmp-cell" data-sim-cell="sub6-both" aria-pressed="false"><span class="sr-only">Sub-6, RIS and MRA: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span><span class="cbar" aria-hidden="true"><span class="ok"></span><span class="below"></span></span></button></td>
+                <th scope="row">Sub-7<small>3.5 GHz</small></th>
+                <td><button type="button" class="cmp-cell" data-sim-cell="sub6-none" aria-pressed="false"><span class="sr-only">Sub-7, no surfaces: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span><span class="cbar" aria-hidden="true"><span class="ok"></span><span class="below"></span></span></button></td>
+                <td><button type="button" class="cmp-cell" data-sim-cell="sub6-ris" aria-pressed="false"><span class="sr-only">Sub-7, RIS only: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span><span class="cbar" aria-hidden="true"><span class="ok"></span><span class="below"></span></span></button></td>
+                <td><button type="button" class="cmp-cell" data-sim-cell="sub6-mra" aria-pressed="false"><span class="sr-only">Sub-7, MRA only: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span><span class="cbar" aria-hidden="true"><span class="ok"></span><span class="below"></span></span></button></td>
+                <td><button type="button" class="cmp-cell" data-sim-cell="sub6-both" aria-pressed="false"><span class="sr-only">Sub-7, RIS and MRA: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span><span class="cbar" aria-hidden="true"><span class="ok"></span><span class="below"></span></span></button></td>
               </tr>
               <tr>
                 <th scope="row">FR3<small>15 GHz</small></th>
@@ -145,7 +145,7 @@ scripts:
         </div>
       </div>
 
-      <figcaption class="lab-caption"><span data-scene-show="indoor">A fixed 2-minute scenario: the same people and the same moves for every option, so the comparison is fair. Illustrative model, not measurements. It assumes a person in the way costs about 4 dB at sub-6, 16 dB at FR3, and 28 dB at mmWave, and that bandwidth grows with frequency. Grey figures are people (they block the signal); crossed tiles are shadowed and excluded; beams are aimed at where the user is predicted to be next.</span><span data-scene-show="o2i" hidden>A fixed 2-minute scenario with the same people, cars, and moves for every option. Illustrative model, not measurements: façade losses follow 3GPP TR 38.901 (glass ≈ 3 / 5 / 8 dB, concrete ≈ 19 / 65 / 117 dB at sub-6 / FR3 / mmWave); the RIS is assumed to be a transmissive panel on the windows with 3 dB insertion loss in place of the glass; a car blocks about 1.5× as much as a person. The losses are the same in both directions, so this holds for the downlink and the uplink. Grey figures are people (they block the signal); crossed tiles are shadowed and excluded.</span><span data-scene-show="out" hidden>A fixed 2-minute street scenario with the same traffic and pedestrians for every option. Illustrative model, not measurements: a tree costs about 4 / 10 / 18 dB at sub-6 / FR3 / mmWave (foliage loss grows with frequency), a person 4 / 16 / 28 dB, a car 1.5× and a bus 2.2× that. FORMULA3 focuses on indoor and outdoor ↔ indoor links; this street scene is included for comparison.</span></figcaption>
+      <figcaption class="lab-caption"><span data-scene-show="indoor">A fixed 2-minute scenario: the same people and the same moves for every option, so the comparison is fair. Illustrative model, not measurements. It assumes a person in the way costs about 4 dB at sub-7, 16 dB at FR3, and 28 dB at mmWave, and that bandwidth grows with frequency. Grey figures are people (they block the signal); crossed tiles are shadowed and excluded; beams are aimed at where the user is predicted to be next.</span><span data-scene-show="o2i" hidden>A fixed 2-minute scenario with the same people, cars, and moves for every option. Illustrative model, not measurements: façade losses follow 3GPP TR 38.901 (glass ≈ 3 / 5 / 8 dB, concrete ≈ 19 / 65 / 117 dB at sub-7 / FR3 / mmWave); the RIS is assumed to be a transmissive panel on the windows with 3 dB insertion loss in place of the glass; a car blocks about 1.5× as much as a person. The losses are the same in both directions, so this holds for the downlink and the uplink. Grey figures are people (they block the signal); crossed tiles are shadowed and excluded.</span><span data-scene-show="out" hidden>A fixed 2-minute street scenario with the same traffic and pedestrians for every option. Illustrative model, not measurements: a tree costs about 4 / 10 / 18 dB at sub-7 / FR3 / mmWave (foliage loss grows with frequency), a person 4 / 16 / 28 dB, a car 1.5× and a bus 2.2× that. FORMULA3 focuses on indoor and outdoor ↔ indoor links; this street scene is included for comparison.</span></figcaption>
     </figure>
   </div>
 </section>
@@ -156,7 +156,7 @@ scripts:
       <div class="section-head">
         <p class="eyebrow">The result</p>
         <h2 data-impact="headline">Programmable surfaces keep FR3 above multi-Gbps rates far more of the time</h2>
-        <p data-impact="sub">The interactive scenario above compares sub-6, FR3, and mmWave, with and without RIS and MRA surfaces.</p>
+        <p data-impact="sub">The interactive scenario above compares sub-7, FR3, and mmWave, with and without RIS and MRA surfaces.</p>
         <p class="results-note">From the illustrative scenario above, not from measurements. Measured results will appear in <a href="{{ '/publications/' | relative_url }}">publications</a>.</p>
       </div>
       <figure class="dumbbell-card">
@@ -209,7 +209,7 @@ scripts:
       <div class="spectrum-bar">
         <div class="band-sub6">
           <span class="band-range">&lt; 7 GHz</span>
-          <span class="band-name">Sub-6 GHz</span>
+          <span class="band-name">Sub-7 GHz</span>
           <span class="band-note">Good coverage, limited bandwidth</span>
         </div>
         <div class="band-fr3">
@@ -224,7 +224,7 @@ scripts:
         </div>
       </div>
       <div class="spectrum-facts">
-        <p><strong>~10×</strong> more bandwidth than sub-6 GHz</p>
+        <p><strong>~10×</strong> more bandwidth than sub-7 GHz</p>
         <p><strong>~2×</strong> the range of mmWave, with better wall penetration</p>
         <p><strong>80%+</strong> of mobile data is consumed indoors, where FORMULA3 focuses</p>
       </div>

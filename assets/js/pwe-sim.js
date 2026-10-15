@@ -282,7 +282,7 @@
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     if (o2i) drawO2IBackdrop(); else if (out) drawOutdoorBackdrop(); else drawIndoorBackdrop();
 
-    // Beam footprint: wide at sub-6, a pencil at mmWave
+    // Beam footprint: wide at sub-7, a pencil at mmWave
     var ang = Math.atan2(u.y - A.y, u.x - A.x), half = CONE[sel.band];
     var reach = S(Math.hypot(u.x - A.x, u.y - A.y) + 0.6);
     var g = ctx.createRadialGradient(X(A.x), Y(A.y), 0, X(A.x), Y(A.y), reach);
@@ -729,9 +729,9 @@
     if (sub) sub.textContent = 'Without surfaces → with RIS + MRA, FR3 is below ' + TARGET + ' Gbps for ' +
       fmtS(I['fr3-none'].belowS) + ' → ' + fmtS(I['fr3-both'].belowS) + ' indoors, ' +
       fmtS(O['fr3-none'].belowS) + ' → ' + fmtS(O['fr3-both'].belowS) + ' between the street and indoors (the façade decides), and ' +
-      fmtS(U['fr3-none'].belowS) + ' → ' + fmtS(U['fr3-both'].belowS) + ' on the street, out of 2 minutes. Sub-6 never reaches ' + TARGET + ' Gbps.';
+      fmtS(U['fr3-none'].belowS) + ' → ' + fmtS(U['fr3-both'].belowS) + ' on the street, out of 2 minutes. Sub-7 never reaches ' + TARGET + ' Gbps.';
     if (db) db.innerHTML = dumbbell('indoor', 'Indoor') + dumbbell('o2i', 'Outdoor ↔ indoor') + dumbbell('out', 'Outdoor street') +
-      '<p class="db-note">Sub-6 is below ' + TARGET + ' Gbps for the full 2 minutes in every scenario, with or without surfaces: its 100 MHz of spectrum is the limit.</p>';
+      '<p class="db-note">Sub-7 is below ' + TARGET + ' Gbps for the full 2 minutes in every scenario, with or without surfaces: its 100 MHz of spectrum is the limit.</p>';
   }
 
   // ---------- Controls ----------
