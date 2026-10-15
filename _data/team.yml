@@ -2,7 +2,7 @@
 #
 # Fields
 #   name         Full name
-#   role         e.g. Lead PI, PI, Co-PI, Senior Personnel, Postdoc, Ph.D. Student
+#   role         Optional label shown above the name (e.g. Postdoc, Ph.D. Student); leave out for investigators
 #   institution  id from _data/partners.yml
 #   title        Optional academic title, shown under the name
 #   expertise    One sentence
@@ -14,7 +14,6 @@
 
 investigators:
   - name: Muhammad Ismail
-    role: Lead PI
     institution: tntech
     title: ""
     expertise: AI-enabled resource management and generalizable AI under concept drift.
@@ -24,7 +23,6 @@ investigators:
     photo: ""
 
   - name: Sabit Ekin
-    role: PI
     institution: tamu
     title: Associate Professor and Charlotte and Walter Buchanan Faculty Fellow, Electronic Systems Engineering Technology (ESET); Director, Generative AI Literacy Initiative, Texas A&M Institute of Data Science
     expertise: Fresnel metallic reflector array (MRA) design, deployment, parameter configuration, channel measurement, and modeling.
@@ -34,7 +32,6 @@ investigators:
     photo: ""
 
   - name: Ted Rappaport
-    role: Co-PI
     institution: nyu
     title: ""
     expertise: FR3 and high-frequency propagation measurements and channel modeling.
@@ -44,7 +41,6 @@ investigators:
     photo: ""
 
   - name: Ertugrul Basar
-    role: Co-PI
     institution: tampere
     title: ""
     expertise: Reconfigurable intelligent surface (RIS) design, deployment, configuration, channel measurement, and modeling.
@@ -54,22 +50,11 @@ investigators:
     photo: ""
 
   - name: Risto Wichman
-    role: Co-PI
     institution: aalto
     title: ""
     expertise: AI-enabled beamforming and integrated sensing and communication (ISAC).
     focus: Leads the ISAC-driven context-awareness framework and the evaluation of AI adaptation strategies.
     leads: [T3.1, T4.3]
-    url: ""
-    photo: ""
-
-  - name: Mostafa Abdelhadi
-    role: Senior Personnel
-    institution: tamu
-    title: ""
-    expertise: Testbed development, channel measurement, and modeling.
-    focus: Supports the FR3 MRA testbed and the dynamic simulation platform.
-    leads: [T1.2]
     url: ""
     photo: ""
 

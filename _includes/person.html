@@ -8,7 +8,7 @@
       {% if m.photo and m.photo != "" %}<img src="{{ '/assets/img/' | append: m.photo | relative_url }}" alt="" loading="lazy">{% else %}{{ initials }}{% endif %}
     </div>
     <div>
-      <div class="role">{{ m.role }}</div>
+      {% if m.role and m.role != "" %}<div class="role">{{ m.role }}</div>{% endif %}
       <h3>{% if m.url and m.url != "" %}<a href="{{ m.url }}">{{ m.name }}</a>{% else %}{{ m.name }}{% endif %}</h3>
       {% if inst %}<div class="inst">{{ inst.name }} <span class="flag">{% if inst.country == "Finland" %}FI{% else %}US{% endif %}</span></div>{% endif %}
     </div>

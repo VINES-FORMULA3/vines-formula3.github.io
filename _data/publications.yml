@@ -78,8 +78,3 @@ prior:
     venue: "IEEE 35th International Symposium on Personal, Indoor and Mobile Radio Communications (PIMRC), pp. 1–6"
     year: 2024
     topic: AI beamforming
-  - title: "Channel estimation approach for RIS assisted MIMO systems"
-    authors: "E. Shtaiwi, H. Zhang, S. Vishwanath, M. Youssef, A. Abdelhadi, and Z. Han"
-    venue: "IEEE Transactions on Cognitive Communications and Networking, vol. 7, no. 2, pp. 452–465"
-    year: 2021
-    topic: RIS
