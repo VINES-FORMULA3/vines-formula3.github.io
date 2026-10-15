@@ -19,7 +19,7 @@ tasks:
   - id: T1.2
     thrust: 1
     name: Dynamic simulation platform and data generation
-    lead: Ekin, Abdelhadi (TAMU)
+    lead: Ekin (TAMU)
     deliverable: Dynamic channel-gain data and models with environment labels
     span: [2, 3]
   - id: T2.1
