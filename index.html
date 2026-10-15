@@ -7,6 +7,7 @@ description: >-
   A joint NSF and Research Council of Finland VINES project.
 body_class: home
 scripts:
+  - /assets/js/pwe-model.js
   - /assets/js/pwe-sim.js
 ---
 
@@ -26,25 +27,69 @@ scripts:
     <figure class="sim-card" aria-labelledby="sim-caption">
       <div class="sim-head">
         <span>Dynamic PWE · top view</span>
-        <span class="live">Illustration</span>
+        <span class="live">Illustrative model</span>
+      </div>
+      <div class="sim-controls">
+        <fieldset class="seg">
+          <legend>Band</legend>
+          <div class="seg-opts">
+          <label><input type="radio" name="sim-band" value="sub6"><span>Sub-6</span></label>
+          <label><input type="radio" name="sim-band" value="fr3" checked><span>FR3</span></label>
+          <label><input type="radio" name="sim-band" value="mmw"><span>mmWave</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="seg">
+          <legend>RIS + MRA surfaces</legend>
+          <div class="seg-opts">
+          <label><input type="radio" name="sim-surf" value="on" checked><span>On</span></label>
+          <label><input type="radio" name="sim-surf" value="off"><span>Off</span></label>
+          </div>
+        </fieldset>
       </div>
       <div class="sim-canvas-wrap">
-        <canvas id="pwe-sim" role="img" aria-label="Animated top view of a room. An access point reaches a moving user through RIS tiles on one wall and a metallic reflector array on another. People walking through the room shadow some tiles, which are excluded, and the beam is steered toward the user's predicted position."></canvas>
-        <p class="sim-fallback">An animated illustration of a programmable wireless environment appears here when JavaScript is enabled.</p>
+        <canvas id="pwe-sim" role="img" aria-label="Animated top view of a room. An access point reaches a moving user directly and, when surfaces are on, through RIS tiles on one wall and a metallic reflector array on another. People walking through the room block paths; shadowed tiles are excluded and beams are steered toward the user's predicted position."></canvas>
+        <p class="sim-fallback">An interactive illustration of a programmable wireless environment appears here when JavaScript is enabled.</p>
       </div>
-      <dl class="sim-hud" aria-live="off">
-        <div><dt>RIS tiles in use</dt><dd data-hud="tiles">–</dd></div>
-        <div><dt>Direct path</dt><dd data-hud="los">–</dd></div>
-        <div><dt>Sensed occupancy</dt><dd data-hud="occ">–</dd></div>
-      </dl>
-      <ul class="sim-legend">
-        <li><i style="background:#fbbf24"></i>Access point</li>
-        <li><i style="background:#2dd4bf"></i>RIS beam</li>
-        <li><i style="background:#a78bfa"></i>MRA beam</li>
-        <li><i style="background:#1b2438;border:1px solid #64748b"></i>Shadowed tile (excluded)</li>
-        <li><i style="background:#475569;border-radius:50%"></i>Person</li>
-      </ul>
-      <figcaption id="sim-caption" class="sim-caption">An illustration of the idea, not a channel model. People moving through the room shadow surface elements, so the network excludes those tiles, steers beams toward where the user will be, and tracks the occupancy as context.</figcaption>
+      <div class="sim-perf">
+        <div class="sim-now">
+          <span class="sim-now-label">Throughput now</span>
+          <span class="sim-now-value"><b data-sim="rate">–</b> Gbps</span>
+          <span class="sim-now-sub" data-sim="config"></span>
+        </div>
+        <div class="sim-spark">
+          <canvas id="pwe-spark" role="img" aria-label="Throughput of the selected option over the last 20 seconds, against a 2 Gbps target"></canvas>
+        </div>
+      </div>
+      <div class="sim-compare-wrap">
+        <table class="sim-compare">
+          <caption>Share of time at ≥ 2 Gbps · same people, same moves for every option · simulated <span data-sim="elapsed">0:00</span></caption>
+          <thead>
+            <tr>
+              <th scope="col">Band</th>
+              <th scope="col"><i class="key off"></i>Surfaces off</th>
+              <th scope="col"><i class="key on"></i>Surfaces on</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Sub-6 GHz<small>3.5 GHz</small></th>
+              <td><button type="button" class="cmp-cell" data-sim-cell="sub6-off" aria-pressed="false"><span class="sr-only">Sub-6 GHz, surfaces off: </span><span class="track"><span class="fill off"></span></span><span class="pct">–</span><span class="avg"></span></button></td>
+              <td><button type="button" class="cmp-cell" data-sim-cell="sub6-on" aria-pressed="false"><span class="sr-only">Sub-6 GHz, surfaces on: </span><span class="track"><span class="fill on"></span></span><span class="pct">–</span><span class="avg"></span></button></td>
+            </tr>
+            <tr>
+              <th scope="row">FR3<small>15 GHz</small></th>
+              <td><button type="button" class="cmp-cell" data-sim-cell="fr3-off" aria-pressed="false"><span class="sr-only">FR3, surfaces off: </span><span class="track"><span class="fill off"></span></span><span class="pct">–</span><span class="avg"></span></button></td>
+              <td><button type="button" class="cmp-cell" data-sim-cell="fr3-on" aria-pressed="false"><span class="sr-only">FR3, surfaces on: </span><span class="track"><span class="fill on"></span></span><span class="pct">–</span><span class="avg"></span></button></td>
+            </tr>
+            <tr>
+              <th scope="row">mmWave<small>28 GHz</small></th>
+              <td><button type="button" class="cmp-cell" data-sim-cell="mmw-off" aria-pressed="false"><span class="sr-only">mmWave, surfaces off: </span><span class="track"><span class="fill off"></span></span><span class="pct">–</span><span class="avg"></span></button></td>
+              <td><button type="button" class="cmp-cell" data-sim-cell="mmw-on" aria-pressed="false"><span class="sr-only">mmWave, surfaces on: </span><span class="track"><span class="fill on"></span></span><span class="pct">–</span><span class="avg"></span></button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <figcaption id="sim-caption" class="sim-caption">Illustrative model, not measurements. A person in the way costs about 4 dB at sub-6, 16 dB at FR3, and 28 dB at mmWave, while bandwidth grows with frequency. Grey dots are people; crossed tiles are shadowed and excluded. Tap a table cell to switch views.</figcaption>
     </figure>
   </div>
 </section>
