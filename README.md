@@ -1,6 +1,6 @@
 # FORMULA3 website
 
-Project website for **FORMULA3: Framework for Optimal Resource Management Using Generalizable AI in FR3 Dynamic Programmable Wireless Environments**, an NSF–Research Council of Finland VINES project (NSF Award Nos. 2549087 and 2549088).
+Project website for **FORMULA3: Framework for Optimal Resource Management Using Generalizable AI in FR3 Dynamic Programmable Wireless Environments**, an NSF–Research Council of Finland VINES project (NSF Award Nos. 2549087 and 2549088; Research Council of Finland Decision Nos. 380594 and 380600).
 
 Live site: https://vines-formula3.github.io/website/
 
@@ -18,7 +18,7 @@ Most updates mean editing one file. You can do it in the GitHub web editor.
 | Datasets | `_data/datasets.yml` | Set `status: released` and fill in `link` (plus `doi` and `license`) when a dataset goes public. |
 | Timeline | `_data/timeline.yml` | `span: [start, end]` in half-year periods 1–6. |
 | Partners | `_data/partners.yml` | Logos in `assets/img/logos/`. |
-| Funding text | `_config.yml` → `awards`, plus `_includes/footer.html` | |
+| Funding text | `_config.yml` → `awards` (NSF) and `rcf_awards` (Research Council of Finland), plus `_includes/footer.html` | |
 
 Longer pages (`research.html`, `outreach.html`, `index.html`) are HTML with a small front-matter header.
 

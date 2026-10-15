@@ -45,6 +45,10 @@ nav:
 awards:
   - { number: "2549087", institution: Tennessee Tech University }
   - { number: "2549088", institution: Texas A&M University }
+# Research Council of Finland funding decisions (listed on research.fi)
+rcf_awards:
+  - { number: "380594", institution: Tampere University, url: "https://research.fi/en/results/funding/89419" }
+  - { number: "380600", institution: Aalto University, url: "https://research.fi/en/results/funding/89420" }
 project_period: October 2026 – September 2029
 
 exclude:

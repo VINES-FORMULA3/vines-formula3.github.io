@@ -209,7 +209,7 @@ scripts:
   <div class="wrap">
     <div class="funding-band">
       <img src="{{ '/assets/img/logos/nsf.png' | relative_url }}" alt="U.S. National Science Foundation" width="64" height="64">
-      <p><strong>Funded through VINES, Verticals-enabling Intelligent Network Systems</strong>, a joint program of the U.S. National Science Foundation (Award Nos. {% for a in site.awards %}<a href="https://www.nsf.gov/awardsearch/show-award/?AWD_ID={{ a.number }}">{{ a.number }}</a>{% unless forloop.last %} and {% endunless %}{% endfor %}) and the Research Council of Finland. Project period: {{ site.project_period }}.</p>
+      <p><strong>Funded through VINES, Verticals-enabling Intelligent Network Systems</strong>, a joint program of the U.S. National Science Foundation (Award Nos. {% for a in site.awards %}<a href="https://www.nsf.gov/awardsearch/show-award/?AWD_ID={{ a.number }}">{{ a.number }}</a>{% unless forloop.last %} and {% endunless %}{% endfor %}) and the Research Council of Finland (Decision Nos. {% for a in site.rcf_awards %}<a href="{{ a.url }}">{{ a.number }}</a>{% unless forloop.last %} and {% endunless %}{% endfor %}). Project period: {{ site.project_period }}.</p>
     </div>
   </div>
 </section>
