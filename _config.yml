@@ -5,11 +5,11 @@ description: >-
   AI-native, sensing-aware FR3 (7–24 GHz) programmable wireless environments that
   keep 6G connectivity reliable under mobility, blockage, occupancy, and layout changes.
 
-# The site is served from https://vines-formula3.github.io/website/
+# The site is served from https://vines-formula3.github.io/
 url: https://vines-formula3.github.io
-baseurl: /website
+baseurl: ""
 lang: en_US
-github_repo: https://github.com/VINES-FORMULA3/website
+github_repo: https://github.com/VINES-FORMULA3/vines-formula3.github.io
 
 permalink: pretty
 markdown: kramdown
