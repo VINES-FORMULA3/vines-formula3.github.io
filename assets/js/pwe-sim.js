@@ -454,7 +454,7 @@
     if (el.status) {
       var ok = r >= TARGET;
       el.status.className = 'sim-status ' + (ok ? 'is-ok' : 'is-below');
-      el.status.textContent = ok ? '✓ Meets 2 Gbps' : '✕ Below 2 Gbps';
+      el.status.textContent = ok ? '✓ Meets ' + TARGET + ' Gbps target' : '✕ Below ' + TARGET + ' Gbps target';
     }
     if (strip) strip.setAttribute('aria-valuenow', String(Math.round(k * DT)));
     if (strip) strip.setAttribute('aria-valuetext', fmtTime(k * DT) + ' of ' + fmtTime(DURATION));
@@ -517,6 +517,13 @@
       if (!st) return;
       cell.querySelector('.pct').textContent = fmtS(st.belowS);
       cell.querySelector('.avg').textContent = st.avg.toFixed(1) + ' Gbps';
+      var frac = st.belowS / DURATION, ok = cell.querySelector('.cbar .ok'), bl = cell.querySelector('.cbar .below');
+      if (ok && bl) {
+        ok.style.flex = (1 - frac) + ' 1 0'; bl.style.flex = frac + ' 1 0';
+        ok.style.display = frac >= 1 ? 'none' : '';
+        bl.style.display = frac <= 0 ? 'none' : '';
+        bl.style.minWidth = frac > 0 ? '3px' : '0';
+      }
       cell.title = cell.querySelector('.sr-only').textContent.replace(/: $/, '') + ': below ' + TARGET + ' Gbps for ' + fmtS(st.belowS) + ' of 2 minutes, ' + st.avg.toFixed(1) + ' Gbps on average';
     });
   }
