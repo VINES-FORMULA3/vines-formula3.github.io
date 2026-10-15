@@ -19,7 +19,7 @@
 // RIS tiles and MRA slat. Shadowed elements are excluded.
 //
 // The numbers are rough, textbook-style trends chosen to show the trade-offs
-// (sub-6: robust but narrow; mmWave: wide but fragile; FR3 in between). Facade
+// (sub-7: robust but narrow; mmWave: wide but fragile; FR3 in between). Facade
 // losses follow the 3GPP TR 38.901 material models (standard glass 2 + 0.2 f dB,
 // concrete 5 + 4 f dB, f in GHz). This is not a measurement or a validated
 // channel model.
@@ -41,7 +41,7 @@
   // ris / mra: extra loss of a surface-assisted path relative to free space (dB);
   // ghz: carrier, used for the 3GPP facade losses.
   var BANDS = [
-    { key: 'sub6', label: 'Sub-6 GHz', short: 'Sub-6', carrier: '3.5 GHz', ghz: 3.5, bw: 0.1, s1m: 46, block: 4,  nlos: -12, ris: -16, mra: -12 },
+    { key: 'sub6', label: 'Sub-7 GHz', short: 'Sub-7', carrier: '3.5 GHz', ghz: 3.5, bw: 0.1, s1m: 46, block: 4,  nlos: -12, ris: -16, mra: -12 },
     { key: 'fr3',  label: 'FR3',       short: 'FR3',   carrier: '15 GHz',  ghz: 15,  bw: 0.6, s1m: 44, block: 16, nlos: -22, ris: -6,  mra: -7 },
     { key: 'mmw',  label: 'mmWave',    short: 'mmWave', carrier: '28 GHz', ghz: 28,  bw: 1.0, s1m: 41, block: 28, nlos: -32, ris: -6,  mra: -8 }
   ];
