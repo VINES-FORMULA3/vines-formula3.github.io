@@ -25,14 +25,6 @@
   logo: nyu.png
   url: https://www.nyu.edu
 
-- id: tampere
-  name: Tampere University
-  short: Tampere
-  country: Finland
-  city: Tampere
-  logo: tampere.png
-  url: https://www.tuni.fi/en
-
 - id: aalto
   name: Aalto University
   short: Aalto
@@ -40,3 +32,11 @@
   city: Espoo
   logo: aalto.png
   url: https://www.aalto.fi/en
+
+- id: tampere
+  name: Tampere University
+  short: Tampere
+  country: Finland
+  city: Tampere
+  logo: tampere.png
+  url: https://www.tuni.fi/en
