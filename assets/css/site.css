@@ -232,7 +232,8 @@ p { margin: 0 0 1em; }
 .sim-fallback { position: absolute; inset: 0; display: grid; place-items: center; color: #94a3b8; font-size: .9rem; padding: 20px; text-align: center; }
 .js .sim-fallback { display: none; }
 
-.sim-controls { display: flex; flex-wrap: wrap; gap: 12px 16px; }
+.sim-controls { display: grid; grid-template-columns: repeat(2, max-content); justify-content: start; gap: 10px 16px; }
+.sim-controls .seg:first-child { grid-column: 1 / -1; }
 .seg { border: 0; margin: 0; padding: 0; min-width: 0; }
 .seg legend { padding: 0; margin-bottom: 6px; font: 500 .68rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: #94a3b8; }
 .seg-opts { display: inline-flex; background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .12); border-radius: 999px; padding: 3px; }
