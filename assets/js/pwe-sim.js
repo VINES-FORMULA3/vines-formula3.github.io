@@ -1,6 +1,6 @@
 // Home page: an interactive, illustrative view of a dynamic programmable wireless
-// environment. Two fixed two-minute scenarios (indoor, and outdoor-to-indoor)
-// play in the hero; visitors pick the scenario, a band, and switch the RIS and
+// environment. Three fixed two-minute scenarios (indoor, outdoor <-> indoor,
+// and an outdoor street) play in the hero; visitors pick the scenario, a band, and switch the RIS and
 // the MRA on or off. The timeline strip shows the whole scenario with the time
 // below the target marked, and the results section compares the options.
 // The link model lives in pwe-model.js.
@@ -26,7 +26,8 @@
   // Representative scenarios (see README)
   var SCENES = {
     indoor: { make: M.createWorld, seed: 210 },
-    o2i: { make: M.createO2IWorld, seed: 392 }
+    o2i: { make: M.createO2IWorld, seed: 392 },
+    out: { make: M.createOutdoorWorld, seed: 366 }
   };
 
   var bands = {};
@@ -66,6 +67,7 @@
   }
   precompute('indoor');
   precompute('o2i');
+  precompute('out');
 
   var sel = { scene: 'indoor', band: 'fr3', ris: true, mra: true };
   function selKey() { return sel.band + '-' + comboId(sel.ris, sel.mra); }
@@ -241,15 +243,44 @@
     label('concrete', FX - 0.12, (O.WINDOWS[0][1] + O.WINDOWS[1][0]) / 2, 'right', 'rgba(148,163,184,.65)');
   }
 
+  function drawOutdoorBackdrop() {
+    var O = M.OUT;
+    ctx.fillStyle = '#0d1426';
+    ctx.fillRect(X(0), Y(0), S(W), S(O.topFacade));
+    ctx.fillRect(X(0), Y(O.bottomFacade), S(W), S(H - O.bottomFacade));
+    ctx.fillStyle = '#111a2f';
+    ctx.fillRect(X(0), Y(O.topFacade), S(W), S(O.street[0] - O.topFacade));
+    ctx.fillRect(X(0), Y(O.street[1]), S(W), S(O.bottomFacade - O.street[1]));
+    ctx.fillStyle = '#080d1b';
+    ctx.fillRect(X(0), Y(O.street[0]), S(W), S(O.street[1] - O.street[0]));
+    ctx.save();
+    ctx.setLineDash([8 * dpr, 10 * dpr]);
+    var mid = (O.street[0] + O.street[1]) / 2;
+    wallLine([[0, mid], [W, mid]], 'rgba(251,191,36,.35)', 1.2);
+    ctx.restore();
+    wallLine([[0, O.topFacade], [W, O.topFacade]], '#64748b', 3);
+    wallLine([[0, O.bottomFacade], [W, O.bottomFacade]], '#64748b', 3);
+    label('building', 0.25, O.topFacade / 2, 'left', 'rgba(148,163,184,.45)');
+    label('building', 0.25, (O.bottomFacade + H) / 2 + 0.2, 'left', 'rgba(148,163,184,.45)');
+    label('street', W - 0.25, O.street[0] + 0.3, 'right', 'rgba(148,163,184,.5)');
+    O.trees.forEach(function (t) {
+      ctx.beginPath(); ctx.arc(X(t.x), Y(t.y), S(t.r), 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(34,197,94,.22)'; ctx.fill();
+      ctx.lineWidth = 1.5 * dpr; ctx.strokeStyle = 'rgba(74,222,128,.55)'; ctx.stroke();
+      ctx.beginPath(); ctx.arc(X(t.x), Y(t.y), S(0.07), 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(74,222,128,.7)'; ctx.fill();
+    });
+  }
+
   function drawScene() {
     var band = bands[sel.band];
     var e = world.evaluate(band, sel.ris, sel.mra);
-    var A = world.ap, u = world.user, q = world.pred;
-    var o2i = world.scene === 'o2i';
+    var A = world.ap, u = world.user;
+    var o2i = world.scene === 'o2i', out = world.scene === 'out';
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = '#0a1124';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    if (o2i) drawO2IBackdrop(); else drawIndoorBackdrop();
+    if (o2i) drawO2IBackdrop(); else if (out) drawOutdoorBackdrop(); else drawIndoorBackdrop();
 
     // Beam footprint: wide at sub-6, a pencil at mmWave
     var ang = Math.atan2(u.y - A.y, u.x - A.x), half = CONE[sel.band];
@@ -278,6 +309,15 @@
       obst.push({ f: fb, kind: 'block' });
     }
     if (o2i && world.cross) obst.push({ f: (world.cross.x - A.x) / dx, kind: world.cross.glass ? 'glass' : 'wall' });
+    if (out && world.treeCount > 0) {
+      var ft = 1;
+      M.OUT.trees.forEach(function (t) {
+        var proj = ((t.x - A.x) * dx + (t.y - A.y) * dy) / (len * len);
+        var px = A.x + dx * proj, py = A.y + dy * proj;
+        if (proj > 0 && proj < 1 && Math.hypot(px - t.x, py - t.y) < t.r) ft = Math.min(ft, proj);
+      });
+      obst.push({ f: ft, kind: 'tree' });
+    }
     obst.sort(function (a, c) { return a.f - c.f; });
     var losAlpha = clamp((e.losDb + 5) / 30, 0, 1);
     if (obst.length) {
@@ -300,6 +340,11 @@
         var cx = X(hp.x), cy = Y(hp.y), r = 4 * dpr;
         ctx.beginPath(); ctx.moveTo(cx - r, cy - r); ctx.lineTo(cx + r, cy + r); ctx.moveTo(cx + r, cy - r); ctx.lineTo(cx - r, cy + r); ctx.stroke();
         ctx.restore();
+      } else if (ob.kind === 'tree') {
+        txt = 'tree −' + Math.round(e.foliageDb) + ' dB';
+        col = '#4ade80';
+        ctx.beginPath(); ctx.arc(X(hp.x), Y(hp.y), 3.5 * dpr, 0, Math.PI * 2);
+        ctx.fillStyle = col; ctx.fill();
       } else {
         var loss = ob.kind === 'glass' ? band.glass : band.concrete;
         txt = (ob.kind === 'glass' ? 'glass −' : 'wall −') + Math.round(loss) + ' dB';
@@ -307,7 +352,7 @@
         ctx.beginPath(); ctx.arc(X(hp.x), Y(hp.y), 3.5 * dpr, 0, Math.PI * 2);
         ctx.fillStyle = col; ctx.fill();
       }
-      if (ob.kind !== 'block') {
+      if (ob.kind === 'glass' || ob.kind === 'wall') {
         // Facade loss: just inside the building, next to where the path crosses
         label(txt, hp.x + 0.18, clamp(hp.y - 0.32, WALL + 0.8, H - WALL - 0.3), 'left', col);
         return;
@@ -343,7 +388,7 @@
 
     // RIS tiles: along the top wall indoors, on the windows outdoors-to-indoor
     var vert = world.tileOrient === 'v';
-    var tw = vert ? 0.14 : 7.5 / 17 * 0.78;
+    var tw = vert ? 0.14 : (out ? 6.4 / 13 : 7.5 / 17) * 0.78;
     var th = vert ? (M.O2I.WINDOWS[0][1] - M.O2I.WINDOWS[0][0]) / 6 * 0.78 : 0.2;
     world.tiles.forEach(function (tl, i) {
       var x = X(tl.x - tw / 2), y = Y(tl.y - th / 2), w = S(tw), h = S(th);
@@ -366,7 +411,9 @@
     });
     var risName = o2i ? 'RIS window' : 'RIS tiles';
     var risCol = sel.ris ? 'rgba(94,234,212,.85)' : 'rgba(148,163,184,.7)';
+    if (out) risName = 'RIS façade';
     if (o2i) label(sel.ris ? risName : risName + ' · off', M.O2I.FX + 0.22, WALL + 0.45, 'left', risCol);
+    else if (out) label(sel.ris ? risName : risName + ' · off', 2.3, M.OUT.topFacade - 0.42, 'left', risCol);
     else label(sel.ris ? risName : risName + ' · off', 1.08, WALL + 0.52, 'left', risCol);
 
     // MRA slats
@@ -386,17 +433,19 @@
     });
     var mraCol = sel.mra ? 'rgba(196,181,253,.85)' : 'rgba(148,163,184,.7)';
     if (o2i) label(sel.mra ? 'MRA' : 'MRA · off', W - WALL - 0.3, WALL + 0.62, 'right', mraCol);
+    else if (out) label(sel.mra ? 'MRA' : 'MRA · off', 3.0, M.OUT.bottomFacade + 0.72, 'center', mraCol);
     else label(sel.mra ? 'MRA' : 'MRA · off', W - WALL - 0.42, 1.45, 'right', mraCol);
 
     // Cars (outdoors)
     world.cars.forEach(function (c) {
-      var cw = M.O2I.CAR.w, ch = M.O2I.CAR.h;
-      ctx.fillStyle = '#334155';
+      var cw = c.horiz ? c.len : c.wid, ch = c.horiz ? c.wid : c.len;
+      ctx.fillStyle = c.bus ? '#3b4a63' : '#334155';
       roundRect(X(c.x - cw / 2), Y(c.y - ch / 2), S(cw), S(ch), S(0.14)); ctx.fill();
       ctx.lineWidth = 1.5 * dpr; ctx.strokeStyle = 'rgba(203,213,225,.4)'; ctx.stroke();
       ctx.fillStyle = 'rgba(148,163,184,.5)';
-      var wy = c.vy > 0 ? c.y + ch * 0.18 : c.y - ch * 0.18 - 0.22;
-      ctx.fillRect(X(c.x - cw * 0.32), Y(wy), S(cw * 0.64), S(0.22));
+      var fwd = (c.horiz ? c.vx : c.vy) > 0 ? 1 : -1, ws = 0.22;
+      if (c.horiz) ctx.fillRect(X(c.x + fwd * (c.len / 2 - 0.12) - (fwd > 0 ? ws : 0)), Y(c.y - c.wid * 0.32), S(ws), S(c.wid * 0.64));
+      else ctx.fillRect(X(c.x - c.wid * 0.32), Y(c.y + fwd * (c.len / 2 - 0.12) - (fwd > 0 ? ws : 0)), S(c.wid * 0.64), S(ws));
     });
 
     // People indoors and on the sidewalk
@@ -407,17 +456,6 @@
       ctx.beginPath(); ctx.arc(X(p.x), Y(p.y), S(0.12), 0, Math.PI * 2);
       ctx.fillStyle = '#94a3b8'; ctx.fill();
     });
-
-    // Where the user is predicted to be next (beams are steered there)
-    if (sel.ris) {
-      ctx.save();
-      ctx.setLineDash([3 * dpr, 4 * dpr]);
-      ctx.strokeStyle = 'rgba(255,255,255,.5)';
-      ctx.lineWidth = 1.2 * dpr;
-      ctx.beginPath(); ctx.arc(X(q.x), Y(q.y), S(0.2), 0, Math.PI * 2); ctx.stroke();
-      ctx.restore();
-      label('t+Δ', q.x, q.y - 0.4, 'center', 'rgba(255,255,255,.55)');
-    }
 
     var met = e.rate >= TARGET;
     var pulse = (Math.sin(world.t * 3) + 1) / 2;
@@ -434,11 +472,10 @@
     roundRect(X(A.x - 0.17), Y(A.y - 0.17), S(0.34), S(0.34), S(0.07));
     ctx.fill();
     ctx.restore();
-    if (o2i) label(world.apLabel + ' · ' + band.carrier, A.x - 0.15, A.y + 0.45, 'left', '#fde68a');
+    if (o2i || out) label(world.apLabel + ' · ' + band.carrier, A.x - 0.15, A.y + (out ? 0.55 : 0.45), 'left', '#fde68a');
     else label(world.apLabel + ' · ' + band.carrier, A.x + 0.32, A.y + 0.3, 'left', '#fde68a');
 
-    var occ = world.occupancy();
-    label('occupancy ' + occ + ' · ' + (occ <= 2 ? 'low' : occ <= 4 ? 'medium' : 'high'), W - WALL - 0.2, H - WALL - 0.28, 'right', 'rgba(148,163,184,.75)');
+    label(world.status(), W - WALL - 0.2, H - WALL - 0.28, 'right', 'rgba(148,163,184,.75)');
   }
 
   // ---------- Timeline strip ----------
@@ -585,7 +622,8 @@
     if (none >= DURATION - 0.01 && now >= DURATION - 0.01) {
       t = b.label + ' never reaches ' + TARGET + ' Gbps: ' + Math.round(b.bw * 1000) + ' MHz of spectrum caps it near ' + (b.bw * 7.5).toFixed(2) + ' Gbps, with or without surfaces.';
     } else if (cid === 'none') {
-      t = (sel.scene === 'o2i' ? 'From the street, the façade decides. Without surfaces, ' : 'Without surfaces, ') +
+      t = (sel.scene === 'o2i' ? 'Between the street and indoors, the façade decides. Without surfaces, ' :
+           sel.scene === 'out' ? 'On the street, traffic and trees get in the way. Without surfaces, ' : 'Without surfaces, ') +
         b.label + ' is below ' + TARGET + ' Gbps for ' + fmtS(none) + ' of these 2 minutes. With RIS + MRA: ' + fmtS(both) + '.';
     } else {
       var ratio = now > 0 ? none / now : Infinity;
@@ -620,7 +658,7 @@
     var step = max <= 25 ? 5 : max <= 60 ? 15 : 30;
     max = Math.ceil(max / step) * step;
     var html = '<div class="db-group"><p class="db-group-title">' + title + '</p>';
-    M.BANDS.forEach(function (b) {
+    M.BANDS.filter(function (b) { return b.key !== 'sub6'; }).forEach(function (b) {
       var a = st[b.key + '-none'].belowS, z = st[b.key + '-both'].belowS;
       html += '<div class="db-row"><div class="db-label">' + b.label + '<small>' + b.carrier + '</small></div><div class="db-track">';
       if (a > max) {
@@ -642,14 +680,17 @@
   }
   function fillResults() {
     var head = q('[data-impact="headline"]'), sub = q('[data-impact="sub"]'), db = q('[data-impact="dumbbell"]');
-    var I = data.indoor.stats, O = data.o2i.stats;
-    var ri = I['fr3-both'].belowS > 0 ? Math.round(I['fr3-none'].belowS / I['fr3-both'].belowS) : null;
-    var ro = O['fr3-both'].belowS > 0 ? Math.round(O['fr3-none'].belowS / O['fr3-both'].belowS) : null;
-    if (head) head.textContent = (ri && ro) ? 'RIS + MRA cut FR3’s time below ' + TARGET + ' Gbps about ' + ri + '× indoors and ' + ro + '× from the street' : 'RIS + MRA keep FR3 above ' + TARGET + ' Gbps far more of the time';
-    if (sub) sub.textContent = 'Indoors, FR3 falls below ' + TARGET + ' Gbps for ' + fmtS(I['fr3-none'].belowS) + ' of 2 minutes without surfaces and ' + fmtS(I['fr3-both'].belowS) +
-      ' with them. From the street, the façade decides: FR3 and mmWave are both below ' + TARGET + ' Gbps for about ' + fmtS(O['fr3-none'].belowS) +
-      ' without surfaces, and a RIS on the windows brings FR3 down to ' + fmtS(O['fr3-both'].belowS) + '. Sub-6 never reaches ' + TARGET + ' Gbps.';
-    if (db) db.innerHTML = dumbbell('indoor', 'Indoor') + dumbbell('o2i', 'Outdoor ↔ indoor');
+    var I = data.indoor.stats, O = data.o2i.stats, U = data.out.stats;
+    function ratio(st) { return st['fr3-both'].belowS > 0 ? st['fr3-none'].belowS / st['fr3-both'].belowS : Infinity; }
+    var rs = [ratio(I), ratio(O), ratio(U)].filter(isFinite);
+    var lo = Math.round(Math.min.apply(null, rs)), hi = Math.round(Math.max.apply(null, rs));
+    if (head) head.textContent = 'RIS + MRA cut FR3’s time below ' + TARGET + ' Gbps ' + lo + '–' + hi + '× across all three scenarios';
+    if (sub) sub.textContent = 'Without surfaces → with RIS + MRA, FR3 is below ' + TARGET + ' Gbps for ' +
+      fmtS(I['fr3-none'].belowS) + ' → ' + fmtS(I['fr3-both'].belowS) + ' indoors, ' +
+      fmtS(O['fr3-none'].belowS) + ' → ' + fmtS(O['fr3-both'].belowS) + ' between the street and indoors (the façade decides), and ' +
+      fmtS(U['fr3-none'].belowS) + ' → ' + fmtS(U['fr3-both'].belowS) + ' on the street, out of 2 minutes. Sub-6 never reaches ' + TARGET + ' Gbps.';
+    if (db) db.innerHTML = dumbbell('indoor', 'Indoor') + dumbbell('o2i', 'Outdoor ↔ indoor') + dumbbell('out', 'Outdoor street') +
+      '<p class="db-note">Sub-6 is below ' + TARGET + ' Gbps for the full 2 minutes in every scenario, with or without surfaces: its 100 MHz of spectrum is the limit.</p>';
   }
 
   // ---------- Controls ----------
@@ -658,7 +699,7 @@
     if (r) r.checked = true;
   }
   function applySceneText() {
-    qa('[data-scene-show]').forEach(function (n) { n.hidden = n.getAttribute('data-scene-show') !== sel.scene; });
+    qa('[data-scene-show]').forEach(function (n) { n.hidden = n.getAttribute('data-scene-show').split(' ').indexOf(sel.scene) < 0; });
   }
   function select(band, ris, mra) {
     sel.band = band; sel.ris = ris; sel.mra = mra;
