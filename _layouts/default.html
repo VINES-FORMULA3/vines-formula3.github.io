@@ -10,8 +10,8 @@
     {{ content }}
   </main>
   {% include footer.html %}
-  <script src="{{ '/assets/js/site.js' | relative_url }}" defer></script>
+  <script src="{{ '/assets/js/site.js' | relative_url }}?v={{ site.time | date: '%s' }}" defer></script>
   {% if page.scripts %}{% for s in page.scripts %}
-  <script src="{{ s | relative_url }}" defer></script>{% endfor %}{% endif %}
+  <script src="{{ s | relative_url }}?v={{ site.time | date: '%s' }}" defer></script>{% endfor %}{% endif %}
 </body>
 </html>
