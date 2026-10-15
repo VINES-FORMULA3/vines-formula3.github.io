@@ -12,100 +12,180 @@ scripts:
 ---
 
 <section class="hero">
-  <div class="wrap hero-grid">
-    <div>
-      <p class="eyebrow"><span class="pill">NSF × Research Council of Finland</span> VINES · Track 1</p>
-      <h1>FORMULA<span class="three">3</span></h1>
-      <p class="hero-title-long"><b>F</b>ramework for <b>O</b>ptimal <b>R</b>esource <b>M</b>anagement <b>U</b>sing Genera<b>L</b>izable <b>A</b>I in FR<b>3</b> Dynamic Programmable Wireless Environments</p>
-      <p class="hero-lede">Self-adapting FR3 networks that combine learning, sensing, and programmable environments to deliver reliable, high-throughput, low-latency 6G connectivity.</p>
-      <div class="hero-actions">
-        <a class="btn btn-primary" href="{{ '/research/' | relative_url }}">Explore the research <span aria-hidden="true">→</span></a>
-        <a class="btn btn-ghost" href="{{ '/team/' | relative_url }}">Meet the team</a>
+  <div class="wrap">
+    <div class="hero-head">
+      <div>
+        <p class="eyebrow"><span class="pill">NSF × Research Council of Finland</span> VINES · Track 1</p>
+        <h1>FORMULA<span class="three">3</span></h1>
+        <p class="hero-title-long"><b>F</b>ramework for <b>O</b>ptimal <b>R</b>esource <b>M</b>anagement <b>U</b>sing Genera<b>L</b>izable <b>A</b>I in FR<b>3</b> Dynamic Programmable Wireless Environments</p>
+      </div>
+      <div class="hero-side">
+        <p class="hero-lede">Self-adapting FR3 networks that combine learning, sensing, and programmable environments to deliver reliable, high-throughput, low-latency 6G connectivity.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="{{ '/research/' | relative_url }}">Explore the research <span aria-hidden="true">→</span></a>
+          <a class="btn btn-ghost" href="{{ '/team/' | relative_url }}">Meet the team</a>
+        </div>
       </div>
     </div>
 
-    <figure class="sim-card" aria-labelledby="sim-caption">
-      <div class="sim-head">
-        <span>Dynamic PWE · top view</span>
-        <span class="live">Illustrative model</span>
-      </div>
-      <div class="sim-controls">
-        <fieldset class="seg">
-          <legend>Band</legend>
-          <div class="seg-opts">
-          <label><input type="radio" name="sim-band" value="sub6"><span>Sub-6</span></label>
-          <label><input type="radio" name="sim-band" value="fr3" checked><span>FR3</span></label>
-          <label><input type="radio" name="sim-band" value="mmw"><span>mmWave</span></label>
-          </div>
-        </fieldset>
-        <fieldset class="seg">
-          <legend>RIS</legend>
-          <div class="seg-opts">
-          <label><input type="radio" name="sim-ris" value="on" checked><span>On</span></label>
-          <label><input type="radio" name="sim-ris" value="off"><span>Off</span></label>
-          </div>
-        </fieldset>
-        <fieldset class="seg">
-          <legend>MRA</legend>
-          <div class="seg-opts">
-          <label><input type="radio" name="sim-mra" value="on" checked><span>On</span></label>
-          <label><input type="radio" name="sim-mra" value="off"><span>Off</span></label>
-          </div>
-        </fieldset>
-      </div>
-      <div class="sim-canvas-wrap">
-        <canvas id="pwe-sim" role="img" aria-label="Animated top view of a room. An access point reaches a moving user directly and, when switched on, through RIS tiles on one wall and a metallic reflector array on another. People walking through the room block paths; shadowed tiles are excluded and beams are steered toward the user's predicted position."></canvas>
-        <p class="sim-fallback">An interactive illustration of a programmable wireless environment appears here when JavaScript is enabled.</p>
-      </div>
-      <div class="sim-perf">
-        <div class="sim-now">
-          <span class="sim-now-label">Throughput now</span>
-          <span class="sim-now-value"><b data-sim="rate">–</b> Gbps</span>
-          <span class="sim-now-sub" data-sim="config"></span>
+    <figure class="lab" aria-labelledby="lab-title">
+      <div class="lab-head">
+        <div>
+          <p class="lab-kicker">Try it</p>
+          <h2 id="lab-title">What do people moving through a room do to a 6G link?</h2>
         </div>
-        <div class="sim-spark">
-          <canvas id="pwe-spark" role="img" aria-label="Throughput of the selected option over the last 20 seconds, against a 2 Gbps target"></canvas>
+        <span class="lab-badge">Illustrative model</span>
+      </div>
+
+      <div class="lab-grid">
+        <div class="lab-room">
+          <div class="sim-canvas-wrap">
+            <canvas id="pwe-sim" role="img" aria-label="Animated top view of a room. An access point reaches a moving user directly and, when switched on, through RIS tiles on one wall and a metallic reflector array on another. People walking through the room block paths; shadowed tiles are excluded and beams are steered toward the user's predicted position."></canvas>
+            <p class="sim-fallback">An interactive illustration of a programmable wireless environment appears here when JavaScript is enabled.</p>
+          </div>
+        </div>
+
+        <div class="lab-side">
+          <div class="sim-controls">
+            <fieldset class="seg">
+              <legend>Band</legend>
+              <div class="seg-opts">
+                <label><input type="radio" name="sim-band" value="sub6"><span>Sub-6</span></label>
+                <label><input type="radio" name="sim-band" value="fr3" checked><span>FR3</span></label>
+                <label><input type="radio" name="sim-band" value="mmw"><span>mmWave</span></label>
+              </div>
+            </fieldset>
+            <fieldset class="seg">
+              <legend>RIS tiles</legend>
+              <div class="seg-opts">
+                <label><input type="radio" name="sim-ris" value="on" checked><span>On</span></label>
+                <label><input type="radio" name="sim-ris" value="off"><span>Off</span></label>
+              </div>
+            </fieldset>
+            <fieldset class="seg">
+              <legend>Reflector array (MRA)</legend>
+              <div class="seg-opts">
+                <label><input type="radio" name="sim-mra" value="on" checked><span>On</span></label>
+                <label><input type="radio" name="sim-mra" value="off"><span>Off</span></label>
+              </div>
+            </fieldset>
+          </div>
+
+          <div class="sim-now">
+            <span class="sim-now-label">Throughput now</span>
+            <span class="sim-now-value"><b data-sim="rate">–</b> Gbps</span>
+            <span class="sim-status" data-sim="status"></span>
+          </div>
+
+          <p class="sim-takeaway" data-sim="takeaway"></p>
+
+          <table class="sim-compare">
+            <caption>Time below 2 Gbps in this 2-minute scenario <span>· lower is better · tap to view</span></caption>
+            <thead>
+              <tr>
+                <th scope="col">Band</th>
+                <th scope="col">None</th>
+                <th scope="col">RIS</th>
+                <th scope="col">MRA</th>
+                <th scope="col">Both</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Sub-6<small>3.5 GHz</small></th>
+                <td><button type="button" class="cmp-cell" data-sim-cell="sub6-none" aria-pressed="false"><span class="sr-only">Sub-6, no surfaces: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
+                <td><button type="button" class="cmp-cell" data-sim-cell="sub6-ris" aria-pressed="false"><span class="sr-only">Sub-6, RIS only: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
+                <td><button type="button" class="cmp-cell" data-sim-cell="sub6-mra" aria-pressed="false"><span class="sr-only">Sub-6, MRA only: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
+                <td><button type="button" class="cmp-cell" data-sim-cell="sub6-both" aria-pressed="false"><span class="sr-only">Sub-6, RIS and MRA: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
+              </tr>
+              <tr>
+                <th scope="row">FR3<small>15 GHz</small></th>
+                <td><button type="button" class="cmp-cell" data-sim-cell="fr3-none" aria-pressed="false"><span class="sr-only">FR3, no surfaces: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
+                <td><button type="button" class="cmp-cell" data-sim-cell="fr3-ris" aria-pressed="false"><span class="sr-only">FR3, RIS only: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
+                <td><button type="button" class="cmp-cell" data-sim-cell="fr3-mra" aria-pressed="false"><span class="sr-only">FR3, MRA only: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
+                <td><button type="button" class="cmp-cell" data-sim-cell="fr3-both" aria-pressed="false"><span class="sr-only">FR3, RIS and MRA: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
+              </tr>
+              <tr>
+                <th scope="row">mmWave<small>28 GHz</small></th>
+                <td><button type="button" class="cmp-cell" data-sim-cell="mmw-none" aria-pressed="false"><span class="sr-only">mmWave, no surfaces: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
+                <td><button type="button" class="cmp-cell" data-sim-cell="mmw-ris" aria-pressed="false"><span class="sr-only">mmWave, RIS only: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
+                <td><button type="button" class="cmp-cell" data-sim-cell="mmw-mra" aria-pressed="false"><span class="sr-only">mmWave, MRA only: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
+                <td><button type="button" class="cmp-cell" data-sim-cell="mmw-both" aria-pressed="false"><span class="sr-only">mmWave, RIS and MRA: </span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="lab-timeline">
+          <div class="tl-head">
+            <div class="tl-buttons">
+              <button type="button" class="sim-btn sim-play is-playing" data-sim="play" aria-label="Pause"><span aria-hidden="true"></span></button>
+              <button type="button" class="sim-btn sim-restart" data-sim="restart" aria-label="Restart from 0:00"><span aria-hidden="true">↺</span></button>
+              <span class="tl-time" data-sim="time">0:00 / 2:00</span>
+            </div>
+            <ul class="tl-legend">
+              <li><i class="lg-line"></i>Throughput of the selected option</li>
+              <li><i class="lg-target"></i>2 Gbps target</li>
+              <li><i class="lg-below"></i>Below target</li>
+              <li><i class="lg-ev">▲▼</i>Person enters / leaves</li>
+            </ul>
+          </div>
+          <canvas id="pwe-strip" tabindex="0" role="slider" aria-label="Scenario timeline. Arrow keys move, space plays or pauses." aria-valuemin="0" aria-valuemax="120" aria-valuenow="0"></canvas>
         </div>
       </div>
-      <div class="sim-compare-wrap">
-        <table class="sim-compare">
-          <caption>Share of time at ≥ 2 Gbps (bars) and average rate · same people and moves for every option · simulated <span data-sim="elapsed">0:00</span></caption>
-          <thead>
-            <tr>
-              <th scope="col">Band</th>
-              <th scope="col">None</th>
-              <th scope="col">RIS</th>
-              <th scope="col">MRA</th>
-              <th scope="col">RIS + MRA</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row">Sub-6 GHz<small>3.5 GHz</small></th>
-              <td><button type="button" class="cmp-cell" data-sim-cell="sub6-none" aria-pressed="false"><span class="sr-only">Sub-6 GHz, No surfaces: </span><span class="track"><span class="fill"></span></span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
-              <td><button type="button" class="cmp-cell" data-sim-cell="sub6-ris" aria-pressed="false"><span class="sr-only">Sub-6 GHz, RIS only: </span><span class="track"><span class="fill"></span></span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
-              <td><button type="button" class="cmp-cell" data-sim-cell="sub6-mra" aria-pressed="false"><span class="sr-only">Sub-6 GHz, MRA only: </span><span class="track"><span class="fill"></span></span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
-              <td><button type="button" class="cmp-cell" data-sim-cell="sub6-both" aria-pressed="false"><span class="sr-only">Sub-6 GHz, RIS and MRA: </span><span class="track"><span class="fill"></span></span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
-            </tr>
-            <tr>
-              <th scope="row">FR3<small>15 GHz</small></th>
-              <td><button type="button" class="cmp-cell" data-sim-cell="fr3-none" aria-pressed="false"><span class="sr-only">FR3, No surfaces: </span><span class="track"><span class="fill"></span></span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
-              <td><button type="button" class="cmp-cell" data-sim-cell="fr3-ris" aria-pressed="false"><span class="sr-only">FR3, RIS only: </span><span class="track"><span class="fill"></span></span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
-              <td><button type="button" class="cmp-cell" data-sim-cell="fr3-mra" aria-pressed="false"><span class="sr-only">FR3, MRA only: </span><span class="track"><span class="fill"></span></span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
-              <td><button type="button" class="cmp-cell" data-sim-cell="fr3-both" aria-pressed="false"><span class="sr-only">FR3, RIS and MRA: </span><span class="track"><span class="fill"></span></span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
-            </tr>
-            <tr>
-              <th scope="row">mmWave<small>28 GHz</small></th>
-              <td><button type="button" class="cmp-cell" data-sim-cell="mmw-none" aria-pressed="false"><span class="sr-only">mmWave, No surfaces: </span><span class="track"><span class="fill"></span></span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
-              <td><button type="button" class="cmp-cell" data-sim-cell="mmw-ris" aria-pressed="false"><span class="sr-only">mmWave, RIS only: </span><span class="track"><span class="fill"></span></span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
-              <td><button type="button" class="cmp-cell" data-sim-cell="mmw-mra" aria-pressed="false"><span class="sr-only">mmWave, MRA only: </span><span class="track"><span class="fill"></span></span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
-              <td><button type="button" class="cmp-cell" data-sim-cell="mmw-both" aria-pressed="false"><span class="sr-only">mmWave, RIS and MRA: </span><span class="track"><span class="fill"></span></span><span class="pct">–</span><span class="avg"></span><span class="sr-only"> average</span></button></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <figcaption id="sim-caption" class="sim-caption">Illustrative model, not measurements. The model assumes a person in the way costs about 4 dB at sub-6, 16 dB at FR3, and 28 dB at mmWave, and that bandwidth grows with frequency. Grey dots are people; crossed tiles are shadowed and excluded. Tap a table cell to switch views.</figcaption>
+
+      <figcaption class="lab-caption">A fixed 2-minute scenario: the same people and the same moves for every option, so the comparison is fair. Illustrative model, not measurements. It assumes a person in the way costs about 4 dB at sub-6, 16 dB at FR3, and 28 dB at mmWave, and that bandwidth grows with frequency. Grey dots are people; crossed tiles are shadowed and excluded; the dashed ring is where the user is predicted to be next.</figcaption>
     </figure>
+  </div>
+</section>
+
+<section class="section results">
+  <div class="wrap">
+    <div class="results-grid">
+      <div class="section-head">
+        <p class="eyebrow">The result</p>
+        <h2 data-impact="headline">Programmable surfaces keep FR3 above multi-Gbps rates far more of the time</h2>
+        <p data-impact="sub">The interactive scenario above compares sub-6, FR3, and mmWave, with and without RIS and MRA surfaces.</p>
+        <p class="results-note">From the illustrative scenario above, not from measurements. Measured results will appear in <a href="{{ '/publications/' | relative_url }}">publications</a>.</p>
+      </div>
+      <figure class="dumbbell-card">
+        <figcaption>
+          <span class="db-title">Time below 2 Gbps in the 2-minute scenario</span>
+          <span class="db-legend"><span><i class="db-key before"></i>No surfaces</span><span><i class="db-key after"></i>RIS + MRA</span></span>
+        </figcaption>
+        <div class="dumbbell" data-impact="dumbbell" role="img" aria-label="Dumbbell chart. Time below 2 Gbps in the scenario for each band, without surfaces and with RIS plus MRA. Values are listed in the table in the interactive panel above."></div>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Who benefits</p>
+      <h2>Applications that cannot wait for a dropped link</h2>
+      <p>Emerging 6G applications need consistent multi-Gbps throughput and sub-millisecond latency indoors, not just good peak numbers.</p>
+    </div>
+    <div class="benefits">
+      <article class="benefit">
+        <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3v4a3 3 0 0 1-3 3h-3.5l-2-2.5h-3l-2 2.5H5a3 3 0 0 1-3-3z"/><circle cx="8" cy="12" r="1.5"/><circle cx="16" cy="12" r="1.5"/></svg></div>
+        <h3>Immersive AR and VR</h3>
+        <p class="need"><b>Needs:</b> multi-Gbps throughput with sub-millisecond latency. A stalled frame breaks immersion.</p>
+        <p><b>FORMULA3:</b> steers beams and surfaces ahead of the user, so movement and blockage don't interrupt the stream.</p>
+      </article>
+      <article class="benefit">
+        <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7z"/><path d="M3.5 12h4l2-3 3 6 2-3h6"/></svg></div>
+        <h3>Remote healthcare</h3>
+        <p class="need"><b>Needs:</b> links that stay up, without surprises, for remote monitoring and tele-surgery.</p>
+        <p><b>FORMULA3:</b> forecasts outages before they happen and reroutes through surfaces. The team's earlier work forecast outages about 100 ms ahead.</p>
+      </article>
+      <article class="benefit">
+        <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M4 20V9l5 3V9l5 3V5h6v15"/><path d="M8 16h1M12 16h1M16 16h1"/></svg></div>
+        <h3>Advanced manufacturing</h3>
+        <p class="need"><b>Needs:</b> reliable wireless in crowded spaces where machines, people, and layouts keep changing.</p>
+        <p><b>FORMULA3:</b> senses occupancy and layout changes from the channel itself, and adapts its AI models when the floor is rearranged.</p>
+      </article>
+    </div>
   </div>
 </section>
 
@@ -218,27 +298,48 @@ scripts:
   <div class="wrap">
     <div class="section-head">
       <p class="eyebrow">What we are aiming for</p>
-      <h2>Project targets</h2>
+      <h2>From today's limits to FORMULA3's targets</h2>
+      <p>Where conventional approaches fall short today, and what the project sets out to achieve.</p>
     </div>
-    <div class="targets">
-      <div class="target">
-        <div class="num">&lt;2<small>%</small></div>
-        <p>QoS degradation when AI models face dynamics they were not trained on</p>
-      </div>
-      <div class="target">
-        <div class="num">50<small>%</small></div>
-        <p>Less signaling overhead by excluding shadowed RIS and reflector elements</p>
-      </div>
-      <div class="target">
-        <div class="num">10<sup>4</sup><small>×</small></div>
-        <p>Lower channel-gain prediction error through physics-informed learning</p>
-      </div>
-      <div class="target">
-        <div class="num">10<small>×</small></div>
-        <p>QoS improvement by mitigating LoS/NLoS interference across hybrid surfaces</p>
-      </div>
+    <div class="ba-grid">
+      <article class="ba">
+        <h3>AI facing conditions it wasn't trained on</h3>
+        <div class="ba-pair">
+          <div class="ba-now"><span class="ba-tag">Today</span><span class="ba-val">&gt;50%</span><span class="ba-note">performance loss</span></div>
+          <span class="ba-arrow" aria-hidden="true">→</span>
+          <div class="ba-goal"><span class="ba-tag">Target</span><span class="ba-val">&lt;2%</span><span class="ba-note">QoS degradation</span></div>
+        </div>
+        <p>Sensing occupancy, mobility, and layout from the channel picks the right model; continual learning handles rearranged rooms.</p>
+      </article>
+      <article class="ba">
+        <h3>Signaling overhead</h3>
+        <div class="ba-pair">
+          <div class="ba-now"><span class="ba-tag">Today</span><span class="ba-val">All</span><span class="ba-note">surface elements managed</span></div>
+          <span class="ba-arrow" aria-hidden="true">→</span>
+          <div class="ba-goal"><span class="ba-tag">Target</span><span class="ba-val">−50%</span><span class="ba-note">overhead</span></div>
+        </div>
+        <p>Shadowed RIS tiles and reflector elements are excluded instead of reconfigured, so the network spends effort only where it helps.</p>
+      </article>
+      <article class="ba">
+        <h3>Channel prediction with few sensors</h3>
+        <div class="ba-pair">
+          <div class="ba-now"><span class="ba-tag">Today</span><span class="ba-val">High</span><span class="ba-note">error from sparse data</span></div>
+          <span class="ba-arrow" aria-hidden="true">→</span>
+          <div class="ba-goal"><span class="ba-tag">Target</span><span class="ba-val">10<sup>4</sup>×</span><span class="ba-note">lower error</span></div>
+        </div>
+        <p>Physics-informed AI builds propagation knowledge into training and densifies sparse channel data.</p>
+      </article>
+      <article class="ba">
+        <h3>Interference between direct and reflected paths</h3>
+        <div class="ba-pair">
+          <div class="ba-now"><span class="ba-tag">Today</span><span class="ba-val">Capped</span><span class="ba-note">QoS from LoS/NLoS interference</span></div>
+          <span class="ba-arrow" aria-hidden="true">→</span>
+          <div class="ba-goal"><span class="ba-tag">Target</span><span class="ba-val">10×</span><span class="ba-note">better QoS</span></div>
+        </div>
+        <p>Users are assigned to surfaces, and RIS, SIM, and MRA settings are chosen so direct and reflected signals stop canceling each other.</p>
+      </article>
     </div>
-    <p class="targets-note">These are research goals set at the start of the project, not measured results. Results will be reported in <a href="{{ '/publications/' | relative_url }}">publications</a> as the work progresses.</p>
+    <p class="targets-note">"Today" reflects conventional approaches and the team's earlier studies, mostly at mmWave and in optical wireless. Targets are research goals set at the start of the project, not measured results; results will be reported in <a href="{{ '/publications/' | relative_url }}">publications</a>.</p>
   </div>
 </section>
 
