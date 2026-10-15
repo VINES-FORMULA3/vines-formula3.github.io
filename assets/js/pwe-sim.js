@@ -303,9 +303,12 @@
     // Direct path: full strength up to the first obstruction, then faded by the loss
     var dx = u.x - A.x, dy = u.y - A.y, len = Math.hypot(dx, dy);
     var obst = [];
-    if (world.losBlocker) {
-      var b = world.losBlocker;
-      var fb = clamp((((b.x - A.x) * dx + (b.y - A.y) * dy) / len - PERSON_R) / len, 0, 1);
+    if (world.losAll && world.losAll.length) {
+      var fb = 1;
+      world.losAll.forEach(function (b) {
+        var r = b.len ? b.wid / 2 : PERSON_R;
+        fb = Math.min(fb, clamp((((b.x - A.x) * dx + (b.y - A.y) * dy) / len - r) / len, 0, 1));
+      });
       obst.push({ f: fb, kind: 'block' });
     }
     if (o2i && world.cross) obst.push({ f: (world.cross.x - A.x) / dx, kind: world.cross.glass ? 'glass' : 'wall' });
@@ -329,11 +332,18 @@
     }
     var nx = -dy / len, ny = dx / len;
     if (ny > 0) { nx = -nx; ny = -ny; }
+    var late = [];  // loss labels, drawn last so people and cars never cover them
     obst.forEach(function (ob) {
       var hp = { x: A.x + dx * ob.f, y: A.y + dy * ob.f };
       var txt, col;
       if (ob.kind === 'block') {
-        txt = '−' + Math.round(e.blockDb) + ' dB';
+        var cnt = { person: 0, car: 0, bus: 0 };
+        world.losAll.forEach(function (b) { cnt[b.len ? (b.bus ? 'bus' : 'car') : 'person']++; });
+        var parts = [];
+        if (cnt.person) parts.push(cnt.person > 1 ? cnt.person + ' people' : 'person');
+        if (cnt.car) parts.push(cnt.car > 1 ? cnt.car + ' cars' : 'car');
+        if (cnt.bus) parts.push(cnt.bus > 1 ? cnt.bus + ' buses' : 'bus');
+        txt = parts.join(' + ') + ' −' + Math.round(e.blockDb) + ' dB';
         col = band.block >= 20 ? '#f87171' : band.block >= 10 ? '#fb923c' : '#fbbf24';
         ctx.save();
         ctx.strokeStyle = col; ctx.lineWidth = 2 * dpr;
@@ -354,7 +364,7 @@
       }
       if (ob.kind === 'glass' || ob.kind === 'wall') {
         // Facade loss: just inside the building, next to where the path crosses
-        label(txt, hp.x + 0.18, clamp(hp.y - 0.32, WALL + 0.8, H - WALL - 0.3), 'left', col);
+        late.push([txt, hp.x + 0.18, clamp(hp.y - 0.32, WALL + 0.8, H - WALL - 0.3), 'left', col]);
         return;
       }
       var lx = hp.x + nx * 0.4, ly = hp.y + ny * 0.4;
@@ -362,7 +372,7 @@
       if (du < 1.1) { var back = 1.1 - du + 0.25; lx -= dx / len * back; ly -= dy / len * back; }
       lx = clamp(lx, WALL + 0.4, W - WALL - 0.4);
       ly = clamp(ly, WALL + 0.7, H - WALL - 0.3);
-      label(txt, lx, ly, nx >= 0 ? 'left' : 'right', col);
+      late.push([txt, lx, ly, nx >= 0 ? 'left' : 'right', col]);
     });
 
     var paths = [{ share: losShare, pts: [A, u], color: '#fde68a' }];
@@ -450,11 +460,17 @@
 
     // People indoors and on the sidewalk
     world.people.concat(world.walkers).forEach(function (p) {
-      ctx.beginPath(); ctx.arc(X(p.x), Y(p.y), S(PERSON_R * 0.72), 0, Math.PI * 2);
+      var hd = p.vx !== undefined || p.vy !== undefined ? Math.atan2(p.vy || 0, p.vx || 0) : Math.atan2(p.ty - p.y, p.tx - p.x);
+      ctx.save();
+      ctx.translate(X(p.x), Y(p.y));
+      ctx.rotate(hd);
+      ctx.beginPath();
+      if (ctx.ellipse) ctx.ellipse(0, 0, S(0.15), S(0.3), 0, 0, Math.PI * 2); else ctx.arc(0, 0, S(0.24), 0, Math.PI * 2);
       ctx.fillStyle = '#475569'; ctx.fill();
-      ctx.lineWidth = 1.5 * dpr; ctx.strokeStyle = 'rgba(203,213,225,.35)'; ctx.stroke();
-      ctx.beginPath(); ctx.arc(X(p.x), Y(p.y), S(0.12), 0, Math.PI * 2);
-      ctx.fillStyle = '#94a3b8'; ctx.fill();
+      ctx.lineWidth = 1.5 * dpr; ctx.strokeStyle = 'rgba(203,213,225,.4)'; ctx.stroke();
+      ctx.beginPath(); ctx.arc(S(0.02), 0, S(0.125), 0, Math.PI * 2);
+      ctx.fillStyle = '#a5b1c2'; ctx.fill();
+      ctx.restore();
     });
 
     var met = e.rate >= TARGET;
@@ -476,6 +492,31 @@
     else label(world.apLabel + ' · ' + band.carrier, A.x + 0.32, A.y + 0.3, 'left', '#fde68a');
 
     label(world.status(), W - WALL - 0.2, H - WALL - 0.28, 'right', 'rgba(148,163,184,.75)');
+
+    // Stack labels that would overlap (boxes in world units)
+    ctx.font = '600 ' + Math.max(10, Math.round(S(0.22))) + 'px "JetBrains Mono", ui-monospace, monospace';
+    var placed = [];
+    late.forEach(function (l) {
+      var w = ctx.measureText(l[0]).width / scale, hgt = 0.34;
+      function box() {
+        var x0 = l[3] === 'left' ? l[1] : l[3] === 'right' ? l[1] - w : l[1] - w / 2;
+        return { x0: x0, x1: x0 + w, y0: l[2] - hgt / 2, y1: l[2] + hgt / 2 };
+      }
+      var b = box(), guard = 0;
+      while (guard++ < 6 && placed.some(function (p) { return b.x0 < p.x1 && b.x1 > p.x0 && b.y0 < p.y1 && b.y1 > p.y0; })) {
+        l[2] -= hgt + 0.04; b = box();
+      }
+      placed.push(b);
+    });
+    late.forEach(function (l) {
+      ctx.save();
+      ctx.font = '600 ' + Math.max(10, Math.round(S(0.22))) + 'px "JetBrains Mono", ui-monospace, monospace';
+      ctx.textAlign = l[3]; ctx.textBaseline = 'middle';
+      ctx.lineWidth = 4 * dpr; ctx.strokeStyle = 'rgba(10,17,36,.9)'; ctx.lineJoin = 'round';
+      ctx.strokeText(l[0], X(l[1]), Y(l[2]));
+      ctx.restore();
+      label(l[0], l[1], l[2], l[3], l[4]);
+    });
   }
 
   // ---------- Timeline strip ----------
