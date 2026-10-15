@@ -1,0 +1,42 @@
+# Partner institutions. `id` is referenced from team.yml.
+# Logos live in assets/img/logos/ (PNG, ~160px tall, transparent or white background).
+
+- id: tntech
+  name: Tennessee Tech University
+  short: Tennessee Tech
+  country: USA
+  city: Cookeville, TN
+  logo: tntech.png
+  url: https://www.tntech.edu
+
+- id: tamu
+  name: Texas A&M University
+  short: Texas A&M
+  country: USA
+  city: College Station, TX
+  logo: tamu.png
+  url: https://www.tamu.edu
+
+- id: nyu
+  name: New York University
+  short: NYU
+  country: USA
+  city: New York, NY
+  logo: nyu.png
+  url: https://www.nyu.edu
+
+- id: tampere
+  name: Tampere University
+  short: Tampere
+  country: Finland
+  city: Tampere
+  logo: tampere.png
+  url: https://www.tuni.fi/en
+
+- id: aalto
+  name: Aalto University
+  short: Aalto
+  country: Finland
+  city: Espoo
+  logo: aalto.png
+  url: https://www.aalto.fi/en

@@ -1,0 +1,25 @@
+{% assign m = include.person %}
+{% assign inst = site.data.partners | where: "id", m.institution | first %}
+{% assign parts = m.name | split: " " %}
+{% assign initials = parts.first | slice: 0 %}{% assign last_part = parts.last | slice: 0 %}{% assign initials = initials | append: last_part %}
+<article class="person">
+  <div class="person-top">
+    <div class="avatar" aria-hidden="true">
+      {% if m.photo and m.photo != "" %}<img src="{{ '/assets/img/' | append: m.photo | relative_url }}" alt="" loading="lazy">{% else %}{{ initials }}{% endif %}
+    </div>
+    <div>
+      <div class="role">{{ m.role }}</div>
+      <h3>{% if m.url and m.url != "" %}<a href="{{ m.url }}">{{ m.name }}</a>{% else %}{{ m.name }}{% endif %}</h3>
+      {% if inst %}<div class="inst">{{ inst.name }} <span class="flag">{% if inst.country == "Finland" %}FI{% else %}US{% endif %}</span></div>{% endif %}
+    </div>
+  </div>
+  {% if m.title and m.title != "" %}<p class="title">{{ m.title }}</p>{% endif %}
+  {% if m.expertise %}<p class="expertise">{{ m.expertise }}</p>{% endif %}
+  {% if m.focus %}<p class="focus">{% if m.advisor %}Advised by {{ m.advisor }}. {% endif %}{{ m.focus }}</p>{% endif %}
+  {% if m.leads and m.leads.size > 0 %}
+  <div class="chips">
+    <span class="chips-label">Leads</span>
+    {% for task in m.leads %}{% assign th = task | slice: 0, 2 | downcase %}<a class="chip {{ th }}" href="{{ '/research/' | relative_url }}#{{ th }}">{{ task }}</a>{% endfor %}
+  </div>
+  {% endif %}
+</article>

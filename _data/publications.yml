@@ -1,0 +1,85 @@
+# Publications.
+#
+# `project` holds papers produced by FORMULA3. Add new entries at the top.
+# Fields: title, authors, venue, year, type (journal | conference | preprint | thesis | talk),
+#         links (any of: pdf, doi, arxiv, code, data). Acknowledge NSF awards 2549087 / 2549088.
+#
+# Example:
+#  - title: "Measuring hybrid RIS–MRA channels in the FR3 upper mid-band"
+#    authors: "A. Author, B. Author, and C. Author"
+#    venue: "IEEE Transactions on Wireless Communications"
+#    year: 2027
+#    type: journal
+#    links:
+#      doi: https://doi.org/10.1109/...
+#      arxiv: https://arxiv.org/abs/....
+
+project: []
+
+# `prior` lists selected earlier work by the team that FORMULA3 builds on.
+# It is shown separately and is not counted as project output.
+prior:
+  - title: "Comprehensive FR1(C) and FR3 lower and upper mid-band propagation and material penetration loss measurements and channel models in indoor environment for 5G and 6G"
+    authors: "D. Shakya, M. Ying, T. S. Rappaport, H. Poddar, P. Ma, Y. Wang, and I. Al-Wazani"
+    venue: "IEEE Open Journal of the Communications Society, vol. 5, pp. 5192–5218"
+    year: 2024
+    topic: FR3 channels
+  - title: "Propagation measurements and channel models in indoor environment at 6.75 GHz FR1(C) and 16.95 GHz FR3 upper-mid band spectrum for 5G and 6G"
+    authors: "D. Shakya, M. Ying, T. S. Rappaport, H. Poddar, P. Ma, Y. Wang, and I. Al-Wazani"
+    venue: "IEEE GLOBECOM, pp. 998–1003"
+    year: 2024
+    topic: FR3 channels
+  - title: "Generalized RIS tile exclusion strategy for indoor mmWave channels under concept drift"
+    authors: "Z.-Y. Wu and M. Ismail"
+    venue: "IEEE Transactions on Wireless Communications, vol. 23, no. 10, pp. 13484–13498"
+    year: 2024
+    topic: Resource management
+  - title: "Efficient exclusion strategy of shadowed RIS in dynamic indoor programmable wireless environments"
+    authors: "Z.-Y. Wu, M. Ismail, and J. Wang"
+    venue: "IEEE Transactions on Wireless Communications, vol. 23, no. 2, pp. 994–1007"
+    year: 2024
+    topic: Resource management
+  - title: "Tidal-like concept drift in RIS-covered buildings: When programmable wireless environments meet human behaviors"
+    authors: "Z.-Y. Wu, M. Ismail, J. Zhang, and J. Zhang"
+    venue: "arXiv preprint arXiv:2507.14876"
+    year: 2025
+    topic: Generalizable AI
+    links:
+      arxiv: https://arxiv.org/abs/2507.14876
+  - title: "Signal whisperers: Enhancing wireless reception using DRL-guided reflector arrays"
+    authors: "H. Le, O. Bedir, M. Ibrahim, J. Tao, and S. Ekin"
+    venue: "arXiv preprint arXiv:2501.15044"
+    year: 2025
+    topic: Reflector arrays
+    links:
+      arxiv: https://arxiv.org/abs/2501.15044
+  - title: "Guiding wireless signals with arrays of metallic linear Fresnel reflectors: A low-cost, frequency-versatile, and practical approach"
+    authors: "H. Le, O. Bedir, M. Ibrahim, J. Tao, and S. Ekin"
+    venue: "IEEE 100th Vehicular Technology Conference (VTC2024-Fall), pp. 1–7"
+    year: 2024
+    topic: Reflector arrays
+  - title: "Reconfigurable intelligent surfaces for 6G: Emerging hardware architectures, applications, and open challenges"
+    authors: "E. Basar, G. C. Alexandropoulos, Y. Liu, Q.-U.-A. Nadeem, S. Jin, C. Yuen, O. A. Dobre, and R. Schober"
+    venue: "IEEE Vehicular Technology Magazine, vol. 19, no. 3, pp. 27–47"
+    year: 2024
+    topic: RIS
+  - title: "Wireless communications through reconfigurable intelligent surfaces"
+    authors: "E. Basar et al."
+    venue: "IEEE Access, vol. 7, pp. 116753–116773"
+    year: 2019
+    topic: RIS
+  - title: "Ensuring line-of-sight condition for accurate positioning and sensing over RF/OWC networks"
+    authors: "M. Abedi, A. A. Dowhuszko, and R. Wichman"
+    venue: "IEEE Transactions on Vehicular Technology, pp. 1–15"
+    year: 2025
+    topic: ISAC
+  - title: "User throughput optimization via deep reinforcement learning for beam switching in mmWave radio access networks"
+    authors: "R. Hashemi, V. Ranasinghe, T. Veijalainen, P. Kela, and R. Wichman"
+    venue: "IEEE 35th International Symposium on Personal, Indoor and Mobile Radio Communications (PIMRC), pp. 1–6"
+    year: 2024
+    topic: AI beamforming
+  - title: "Channel estimation approach for RIS assisted MIMO systems"
+    authors: "E. Shtaiwi, H. Zhang, S. Vishwanath, M. Youssef, A. Abdelhadi, and Z. Han"
+    venue: "IEEE Transactions on Cognitive Communications and Networking, vol. 7, no. 2, pp. 452–465"
+    year: 2021
+    topic: RIS

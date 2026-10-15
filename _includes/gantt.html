@@ -1,0 +1,32 @@
+{% assign tl = site.data.timeline %}
+<div class="gantt-scroll" tabindex="0" role="region" aria-label="Project timeline table, scrolls horizontally">
+  <table class="gantt">
+    <thead>
+      <tr class="yr">
+        <th scope="col" rowspan="2">Task</th>
+        <th scope="colgroup" colspan="2">Year 1</th>
+        <th scope="colgroup" colspan="2">Year 2</th>
+        <th scope="colgroup" colspan="2">Year 3</th>
+      </tr>
+      <tr class="hf">
+        {% for p in tl.periods %}<th scope="col" class="p" title="{{ p.dates }}">{{ p.half }}</th>{% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for task in tl.tasks %}
+      {% assign s = task.span[0] %}{% assign e = task.span[1] %}
+      <tr class="t{{ task.thrust }}">
+        <th scope="row" class="task-cell"><b>{{ task.id }}</b>{{ task.name }}<small>{{ task.lead }} · {{ task.deliverable }}</small></th>
+        {% for i in (1..6) %}
+        {% if i >= s and i <= e %}
+        <td class="p on{% if i == s %} start{% endif %}{% if i == e %} end{% endif %}" title="{{ tl.periods[forloop.index0].dates }}"><div class="bar"></div><span class="sr-only">active</span></td>
+        {% else %}
+        <td class="p"></td>
+        {% endif %}
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<p class="gantt-note">H1 runs October to March and H2 runs April to September. Hover a bar to see its dates.</p>

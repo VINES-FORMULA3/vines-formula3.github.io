@@ -1,0 +1,84 @@
+# People shown on the Team page.
+#
+# Fields
+#   name         Full name
+#   role         e.g. Lead PI, PI, Co-PI, Senior Personnel, Postdoc, Ph.D. Student
+#   institution  id from _data/partners.yml
+#   title        Optional academic title, shown under the name
+#   expertise    One sentence
+#   focus        What this person does in FORMULA3
+#   leads        Task IDs this person leads (see Research page)
+#   url          Optional profile page (the name becomes a link)
+#   photo        Optional, e.g. team/ismail.jpg -> assets/img/team/ismail.jpg (square, ≥ 400px)
+#                Without a photo, initials are shown.
+
+investigators:
+  - name: Muhammad Ismail
+    role: Lead PI
+    institution: tntech
+    title: ""
+    expertise: AI-enabled resource management and generalizable AI under concept drift.
+    focus: Coordinates the project. Leads surface channel prediction, shadowed-surface exclusion, continual learning, and end-to-end evaluation.
+    leads: [T2.1, T2.2, T3.2, T4.4]
+    url: ""
+    photo: ""
+
+  - name: Sabit Ekin
+    role: PI
+    institution: tamu
+    title: Associate Professor and Charlotte and Walter Buchanan Faculty Fellow, Electronic Systems Engineering Technology (ESET); Director, Generative AI Literacy Initiative, Texas A&M Institute of Data Science
+    expertise: Fresnel metallic reflector array (MRA) design, deployment, parameter configuration, channel measurement, and modeling.
+    focus: Leads Texas A&M's part of the project, including the FR3 measurement campaign, the dynamic simulation platform, and channel-model validation.
+    leads: [T1.1, T1.2, T4.1]
+    url: ""
+    photo: ""
+
+  - name: Ted Rappaport
+    role: Co-PI
+    institution: nyu
+    title: ""
+    expertise: FR3 and high-frequency propagation measurements and channel modeling.
+    focus: Advises the FR3 measurement campaign, channel modeling, and validation of the measured and synthetic data.
+    leads: [T1.1, T4.1]
+    url: ""
+    photo: ""
+
+  - name: Ertugrul Basar
+    role: Co-PI
+    institution: tampere
+    title: ""
+    expertise: Reconfigurable intelligent surface (RIS) design, deployment, configuration, channel measurement, and modeling.
+    focus: Leads interference-aware user assignment and surface configuration, and their evaluation. Hosts the FR3 RIS testbed at Tampere.
+    leads: [T2.3, T4.2]
+    url: ""
+    photo: ""
+
+  - name: Risto Wichman
+    role: Co-PI
+    institution: aalto
+    title: ""
+    expertise: AI-enabled beamforming and integrated sensing and communication (ISAC).
+    focus: Leads the ISAC-driven context-awareness framework and the evaluation of AI adaptation strategies.
+    leads: [T3.1, T4.3]
+    url: ""
+    photo: ""
+
+  - name: Mostafa Abdelhadi
+    role: Senior Personnel
+    institution: tamu
+    title: ""
+    expertise: Testbed development, channel measurement, and modeling.
+    focus: Supports the FR3 MRA testbed and the dynamic simulation platform.
+    leads: [T1.2]
+    url: ""
+    photo: ""
+
+# Postdocs and students. Add entries as people join, for example:
+#  - name: Jane Doe
+#    role: Ph.D. Student
+#    institution: tamu
+#    advisor: Sabit Ekin
+#    focus: FR3 channel measurements with metallic reflector arrays
+#    url: ""
+#    photo: ""
+members: []

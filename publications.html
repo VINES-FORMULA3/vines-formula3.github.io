@@ -1,0 +1,40 @@
+---
+title: Publications
+kicker: Output
+lede: Papers, preprints, and talks from FORMULA3, followed by earlier work by the team that the project builds on.
+description: Publications from the FORMULA3 project and selected prior work by the team on FR3 channels, RIS, reflector arrays, generalizable AI, and ISAC.
+---
+{% assign pubs = site.data.publications %}
+
+<section class="research-section">
+  <div class="wrap"><div class="col-narrow">
+    <div class="section-head">
+      <p class="eyebrow">FORMULA3 publications</p>
+      <h2>Project output</h2>
+    </div>
+    {% if pubs.project.size > 0 %}
+      {% assign by_year = pubs.project | group_by: "year" | sort: "name" | reverse %}
+      {% for group in by_year %}
+      <h3 class="pub-year">{{ group.name }}</h3>
+      <ul class="pubs">
+        {% for p in group.items %}{% include pub.html pub=p %}{% endfor %}
+      </ul>
+      {% endfor %}
+    {% else %}
+    <div class="empty-state">
+      <p>The project started in October 2026. Papers will appear here as they are published.</p>
+    </div>
+    {% endif %}
+
+    <div class="section-head" style="margin-top:64px">
+      <p class="eyebrow">Background</p>
+      <h2>Selected prior work by the team</h2>
+      <p>Earlier results from the investigators that FORMULA3 builds on. These predate the project and are not project output.</p>
+    </div>
+    <ul class="pubs">
+      {% assign prior = pubs.prior | sort: "year" | reverse %}
+      {% for p in prior %}{% include pub.html pub=p %}{% endfor %}
+    </ul>
+  </div>
+  </div>
+</section>

@@ -1,0 +1,25 @@
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="{{ '/' | relative_url }}">
+      {% include brand-mark.svg %}
+      <span class="brand-text">
+        <span class="brand-name">FORMULA3</span>
+        <span class="brand-sub">NSF–RCF VINES</span>
+      </span>
+    </a>
+    <button class="nav-button" type="button" aria-expanded="false" aria-controls="site-nav">
+      <span class="nav-button-bars" aria-hidden="true"></span>
+      <span class="sr-only">Menu</span>
+    </button>
+    <nav id="site-nav" class="site-nav" aria-label="Main">
+      <ul>
+        {% for item in site.nav %}
+        {% assign active = false %}
+        {% if page.url == item.url %}{% assign active = true %}{% endif %}
+        {% if item.url == '/news/' and page.collection == 'news' %}{% assign active = true %}{% endif %}
+        <li><a href="{{ item.url | relative_url }}"{% if active %} aria-current="page"{% endif %}>{{ item.title }}</a></li>
+        {% endfor %}
+      </ul>
+    </nav>
+  </div>
+</header>

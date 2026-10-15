@@ -1,0 +1,18 @@
+---
+layout: default
+---
+<article class="news-article">
+  <header class="page-hero">
+    <div class="wrap wrap-narrow">
+      <p class="kicker"><a href="{{ '/news/' | relative_url }}">News</a> · <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %-d, %Y" }}</time></p>
+      <h1>{{ page.title }}</h1>
+      {% if page.summary %}<p class="lede">{{ page.summary }}</p>{% endif %}
+    </div>
+  </header>
+  <div class="wrap wrap-narrow">
+    <div class="prose">
+      {{ content }}
+      <p class="back-link"><a href="{{ '/news/' | relative_url }}">← All news</a></p>
+    </div>
+  </div>
+</article>

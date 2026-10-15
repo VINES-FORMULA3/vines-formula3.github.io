@@ -1,0 +1,39 @@
+---
+title: Datasets
+kicker: Open data
+lede: Measured and synthetic FR3 channel data for programmable wireless environments under real-world dynamics, to be shared openly with the research community.
+description: Planned open datasets from FORMULA3, covering FR3 hybrid RIS/MRA channel measurements, dynamic simulation data, and an ISAC context benchmark.
+---
+
+<section class="research-section">
+  <div class="wrap">
+    <div class="datasets">
+      {% for d in site.data.datasets %}
+      <article class="dataset" id="{{ d.id }}">
+        <div>
+          <h2>{{ d.name }}</h2>
+          <p>{{ d.summary }}</p>
+          {% if d.contents %}
+          <ul>
+            {% for c in d.contents %}<li>{{ c }}</li>{% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+        <aside>
+          <span class="status status-{{ d.status }}">{% case d.status %}{% when "released" %}Released{% when "in-progress" %}In progress{% else %}Planned{% endcase %}</span>
+          <dl>
+            <div><dt>Produced in</dt><dd><a href="{{ '/research/' | relative_url }}#{{ d.thrust | slice: 0, 2 | downcase }}">{{ d.thrust }}</a></dd></div>
+            {% if d.license and d.license != "" %}<div><dt>License</dt><dd>{{ d.license }}</dd></div>{% endif %}
+            {% if d.doi and d.doi != "" %}<div><dt>DOI</dt><dd><a href="{{ d.doi }}">{{ d.doi | remove: "https://doi.org/" }}</a></dd></div>{% endif %}
+          </dl>
+          {% if d.link and d.link != "" %}<a class="btn btn-outline" href="{{ d.link }}">Access dataset →</a>{% endif %}
+        </aside>
+      </article>
+      {% endfor %}
+    </div>
+
+    <div class="funding-band" style="margin-top:32px">
+      <p><strong>Data sharing.</strong> FORMULA3 will release its synthetic and experimental datasets to the research community, following the project's NSF data management plan. Each release will include documentation, environment labels, and a recommended citation. Release announcements will be posted in <a href="{{ '/news/' | relative_url }}">News</a>.</p>
+    </div>
+  </div>
+</section>

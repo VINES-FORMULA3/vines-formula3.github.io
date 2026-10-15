@@ -1,0 +1,12 @@
+{% assign p = include.pub %}
+<li class="pub">
+  <p class="pub-title">{{ p.title }}</p>
+  <p class="pub-authors">{{ p.authors }}</p>
+  <p class="pub-venue">{{ p.venue }}, {{ p.year }}</p>
+  {% if p.topic or p.type or p.links %}
+  <div class="pub-meta">
+    {% if p.topic %}<span class="topic">{{ p.topic }}</span>{% elsif p.type %}<span class="topic">{{ p.type }}</span>{% endif %}
+    {% if p.links %}{% for l in p.links %}{% if l[1] and l[1] != "" %}<a href="{{ l[1] }}">{% case l[0] %}{% when "pdf" %}PDF{% when "doi" %}DOI{% when "arxiv" %}arXiv{% when "code" %}Code{% when "data" %}Data{% else %}{{ l[0] }}{% endcase %} ↗</a>{% endif %}{% endfor %}{% endif %}
+  </div>
+  {% endif %}
+</li>

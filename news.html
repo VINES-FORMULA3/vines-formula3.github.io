@@ -1,0 +1,13 @@
+---
+title: News
+kicker: Updates
+lede: Milestones, publications, dataset releases, and events from the FORMULA3 project.
+description: News and updates from the FORMULA3 NSF–Research Council of Finland VINES project.
+---
+{% assign items = site.news | sort: "date" | reverse %}
+<section class="research-section">
+  <div class="wrap"><div class="col-narrow">
+    {% include news-list.html items=items %}
+  </div>
+  </div>
+</section>

@@ -1,0 +1,44 @@
+# Datasets released by FORMULA3.
+# status: planned | in-progress | released
+# When a dataset is released, set status: released and fill in `link` (and optionally doi, license, size, citation).
+
+- id: fr3-measurements
+  name: FR3 Hybrid PWE Measurement Dataset
+  thrust: T1.1
+  status: planned
+  summary: Measured FR3 channels in programmable wireless environments that combine reconfigurable intelligent surfaces (RIS) and metallic reflector arrays (MRA).
+  contents:
+    - Indoor and outdoor-to-indoor (O2I) channel measurements around 7 GHz (Texas A&M) and 15 GHz (Tampere)
+    - Reflection coefficients, beam patterns, and polarization behavior of the surfaces
+    - Path loss, penetration loss, delay spread, and coherence bandwidth and time
+    - Near-field effects and hardware nonidealities of the fabricated prototypes
+  link: ""
+  doi: ""
+  license: ""
+
+- id: dynamic-simulation
+  name: Dynamic FR3 PWE Simulation Dataset
+  thrust: T1.2
+  status: planned
+  summary: Synthetic channel data from a CST Studio–NVIDIA Sionna simulation suite calibrated against measurements, covering the dynamics real rooms actually have.
+  contents:
+    - Multi-user mobility, including users entering, wandering, and leaving a room
+    - Time-varying occupancy levels
+    - Layout changes, from chairs moving to furniture being added or removed
+    - An environment label for every sample, ready for AI training and testing
+  link: ""
+  doi: ""
+  license: ""
+
+- id: isac-context
+  name: ISAC Context Benchmark
+  thrust: T3
+  status: planned
+  summary: Channel data paired with environment context, for training and benchmarking ISAC models that infer occupancy, mobility stage, and layout changes from the channel itself.
+  contents:
+    - Channel-gain sequences labeled with occupancy level and mobility stage
+    - Layout-change events, for studying concept drift and continual learning
+    - Train and test splits for evaluating generalization to unseen scenarios
+  link: ""
+  doi: ""
+  license: ""

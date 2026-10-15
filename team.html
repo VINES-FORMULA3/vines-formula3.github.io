@@ -1,0 +1,53 @@
+---
+title: Team
+kicker: People
+lede: An international team spanning FR3 propagation, reconfigurable surfaces, reflector arrays, generalizable AI, and integrated sensing, across five universities in the United States and Finland.
+description: Investigators, students, and partner institutions of the FORMULA3 NSF–Research Council of Finland VINES project.
+---
+{% assign team = site.data.team %}
+
+<section class="research-section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Investigators</p>
+      <h2>Principal investigators and senior personnel</h2>
+    </div>
+    <div class="people">
+      {% for m in team.investigators %}
+      {% include person.html person=m %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="research-section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Researchers</p>
+      <h2>Postdocs and students</h2>
+      <p>The project trains Ph.D. students, postdoctoral researchers, and undergraduates across all five institutions, with co-advising and student exchanges between the U.S. and Finland.</p>
+    </div>
+    {% if team.members.size > 0 %}
+    <div class="people">
+      {% for m in team.members %}
+      {% include person.html person=m %}
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <p>Postdocs and students will be listed here as they join the project.</p>
+      <p>Interested in joining? Reach out to the investigator at your institution of interest.</p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<section class="research-section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Institutions</p>
+      <h2>Partner universities</h2>
+    </div>
+    {% include partners.html %}
+  </div>
+</section>
