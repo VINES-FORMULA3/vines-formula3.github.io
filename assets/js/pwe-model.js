@@ -121,11 +121,11 @@
       };
     }
     function blockers(a, b) {
-      var n = 0, first = null;
+      var n = 0, first = null, all = [];
       for (var k = 0; k < people.length; k++) {
-        if (segDist(a.x, a.y, b.x, b.y, people[k].x, people[k].y) < PERSON_R) { n++; if (!first) first = people[k]; }
+        if (segDist(a.x, a.y, b.x, b.y, people[k].x, people[k].y) < PERSON_R) { n++; all.push(people[k]); if (!first) first = people[k]; }
       }
-      return { n: n, first: first };
+      return { n: n, first: first, all: all };
     }
 
     world.occupancy = function () {
@@ -187,6 +187,7 @@
       var los = blockers(AP, u);
       world.losCount = los.n;
       world.losBlocker = los.first;
+      world.losAll = los.all;
     };
 
     // Link quality for one band, with the RIS and/or the MRA switched on
@@ -286,17 +287,17 @@
 
     // People and walkers count as one blocker each; a car counts CAR_FACTOR times
     function blockers(a, b) {
-      var n = 0, first = null, k;
+      var n = 0, first = null, all = [], k;
       for (k = 0; k < people.length; k++) {
-        if (segDist(a.x, a.y, b.x, b.y, people[k].x, people[k].y) < PERSON_R) { n++; if (!first) first = people[k]; }
+        if (segDist(a.x, a.y, b.x, b.y, people[k].x, people[k].y) < PERSON_R) { n++; all.push(people[k]); if (!first) first = people[k]; }
       }
       for (k = 0; k < walkers.length; k++) {
-        if (segDist(a.x, a.y, b.x, b.y, walkers[k].x, walkers[k].y) < PERSON_R) { n++; if (!first) first = walkers[k]; }
+        if (segDist(a.x, a.y, b.x, b.y, walkers[k].x, walkers[k].y) < PERSON_R) { n++; all.push(walkers[k]); if (!first) first = walkers[k]; }
       }
       for (k = 0; k < cars.length; k++) {
-        if (hitsVehicle(a, b, cars[k])) { n += cars[k].factor; if (!first) first = cars[k]; }
+        if (hitsVehicle(a, b, cars[k])) { n += cars[k].factor; all.push(cars[k]); if (!first) first = cars[k]; }
       }
-      return { n: n, first: first };
+      return { n: n, first: first, all: all };
     }
 
     world.occupancy = function () {
@@ -374,6 +375,7 @@
       var los = blockers(BS, u);
       world.losCount = los.n;
       world.losBlocker = los.first;
+      world.losAll = los.all;
       world.cross = facadeAt(BS, u);
     };
 
@@ -459,14 +461,14 @@
     };
 
     function blockers(a, b) {
-      var n = 0, first = null, k;
+      var n = 0, first = null, all = [], k;
       for (k = 0; k < walkers.length; k++) {
-        if (segDist(a.x, a.y, b.x, b.y, walkers[k].x, walkers[k].y) < PERSON_R) { n++; if (!first) first = walkers[k]; }
+        if (segDist(a.x, a.y, b.x, b.y, walkers[k].x, walkers[k].y) < PERSON_R) { n++; all.push(walkers[k]); if (!first) first = walkers[k]; }
       }
       for (k = 0; k < cars.length; k++) {
-        if (hitsVehicle(a, b, cars[k])) { n += cars[k].factor; if (!first) first = cars[k]; }
+        if (hitsVehicle(a, b, cars[k])) { n += cars[k].factor; all.push(cars[k]); if (!first) first = cars[k]; }
       }
-      return { n: n, first: first };
+      return { n: n, first: first, all: all };
     }
     function trees(a, b) {
       var n = 0;
@@ -527,6 +529,7 @@
       var los = blockers(BSo, u);
       world.losCount = los.n;
       world.losBlocker = los.first;
+      world.losAll = los.all;
       world.treeCount = trees(BSo, u);
     };
 
