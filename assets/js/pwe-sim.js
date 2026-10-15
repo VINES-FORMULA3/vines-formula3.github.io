@@ -1,9 +1,9 @@
 // Home page: an interactive, illustrative view of a dynamic programmable wireless
-// environment. A fixed two-minute scenario (same people, same moves for everyone)
-// plays in the hero; visitors pick a band and switch the RIS and the MRA on or off.
-// The timeline strip shows the whole scenario with the time below the target
-// marked, and the results section compares the options. The link model lives in
-// pwe-model.js.
+// environment. Two fixed two-minute scenarios (indoor, and outdoor-to-indoor)
+// play in the hero; visitors pick the scenario, a band, and switch the RIS and
+// the MRA on or off. The timeline strip shows the whole scenario with the time
+// below the target marked, and the results section compares the options.
+// The link model lives in pwe-model.js.
 (function () {
   var M = window.PWEModel;
   var canvas = document.getElementById('pwe-sim');
@@ -14,15 +14,20 @@
   var tctx = strip && strip.getContext ? strip.getContext('2d') : null;
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  var W = M.W, H = M.H, WALL = M.WALL, DOOR = M.DOOR, AP = M.AP, PERSON_R = M.PERSON_R;
-  var SEED = 210;            // a representative scenario (see README)
-  var DURATION = 120;        // seconds
+  var W = M.W, H = M.H, WALL = M.WALL, PERSON_R = M.PERSON_R;
+  var DURATION = 120;        // seconds per scenario
   var DT = 0.05;             // fixed simulation step
   var N = Math.round(DURATION / DT);
   var TARGET = 2;            // Gbps: a multi-Gbps demo threshold
   var YMAX = 8;              // Gbps: strip scale
   var LINE = '#199e70', BELOW = '#d03b3b';
-  var CONE = { sub6: 0.55, fr3: 0.24, mmw: 0.1 }; // AP beam half-width (rad), picture only
+  var CONE = { sub6: 0.55, fr3: 0.24, mmw: 0.1 }; // beam half-width (rad), picture only
+
+  // Representative scenarios (see README)
+  var SCENES = {
+    indoor: { make: M.createWorld, seed: 210 },
+    o2i: { make: M.createO2IWorld, seed: 392 }
+  };
 
   var bands = {};
   M.BANDS.forEach(function (b) { bands[b.key] = b; });
@@ -39,33 +44,42 @@
     COMBOS.forEach(function (c) { configs.push({ key: b.key + '-' + c.id, band: b, ris: c.ris, mra: c.mra }); });
   });
 
-  // ---------- Precompute the whole scenario for every option ----------
-  var series = {}, stats = {}, events = [];
-  (function () {
-    var w = M.createWorld(SEED), last = w.occupancy();
+  // ---------- Precompute each scenario for every option ----------
+  var data = {};
+  function precompute(sceneKey) {
+    var sc = SCENES[sceneKey], w = sc.make(sc.seed), last = w.occupancy();
+    var series = {}, stats = {}, events = [];
     configs.forEach(function (c) { series[c.key] = new Float32Array(N); });
     for (var i = 0; i < N; i++) {
       w.step(DT);
       configs.forEach(function (c) { series[c.key][i] = w.evaluate(c.band, c.ris, c.mra).rate; });
       var o = w.occupancy();
-      if (o !== last) { events.push({ i: i, dir: o > last ? 1 : -1 }); last = o; }
+      if (o !== last) { events.push({ i: i, kind: o > last ? 'in' : 'out' }); last = o; }
+      if (w.carEvent) { events.push({ i: i, kind: 'car' }); w.carEvent = false; }
     }
     configs.forEach(function (c) {
       var s = series[c.key], below = 0, sum = 0;
       for (var j = 0; j < N; j++) { if (s[j] < TARGET) below++; sum += s[j]; }
       stats[c.key] = { belowS: below * DT, avg: sum / N };
     });
-  })();
+    data[sceneKey] = { series: series, stats: stats, events: events };
+  }
+  precompute('indoor');
+  precompute('o2i');
 
-  var sel = { band: 'fr3', ris: true, mra: true };
+  var sel = { scene: 'indoor', band: 'fr3', ris: true, mra: true };
   function selKey() { return sel.band + '-' + comboId(sel.ris, sel.mra); }
+  function cur() { return data[sel.scene]; }
 
   // ---------- Playback (fixed step, so it matches the precomputed run) ----------
   var world = null, k = 0;
   var tileGlow = [], mraGlow = [];
   function seek(toK) {
     toK = Math.max(1, Math.min(N, toK));
-    if (!world || toK < k) { world = M.createWorld(SEED); k = 0; }
+    if (!world || toK < k) {
+      var sc = SCENES[sel.scene];
+      world = sc.make(sc.seed); k = 0; tileGlow = []; mraGlow = [];
+    }
     while (k < toK) { world.step(DT); k++; }
     glow(1);
   }
@@ -83,14 +97,14 @@
       mraGlow[i] = mraGlow[i] === undefined ? target : mraGlow[i] + (target - mraGlow[i]) * ease;
     });
   }
-  function rateNow() { return series[selKey()][k - 1]; }
+  function rateNow() { return cur().series[selKey()][k - 1]; }
 
   function db2lin(db) { return Math.pow(10, db / 10); }
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
   function fmtTime(sec) { sec = Math.round(sec); return Math.floor(sec / 60) + ':' + ('0' + (sec % 60)).slice(-2); }
   function fmtS(s) { return (s >= 10 ? s.toFixed(0) : s.toFixed(1)) + ' s'; }
 
-  // ---------- Room ----------
+  // ---------- Scene drawing ----------
   var dpr = 1, scale = 1, ox = 0, oy = 0, phase = 0;
   function resize() {
     dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -129,7 +143,8 @@
     ctx.stroke();
     ctx.restore();
   }
-  function packets(points, color) {
+  function packets(points, color, reverse, offset) {
+    if (reverse) points = points.slice().reverse();
     var lens = [], total = 0;
     for (var i = 1; i < points.length; i++) {
       var l = Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y);
@@ -137,7 +152,7 @@
     }
     ctx.fillStyle = color;
     for (var n = 0; n < 4; n++) {
-      var s = ((phase + n / 4) % 1) * total;
+      var s = ((phase + (offset || 0) + n / 4) % 1) * total;
       for (var m = 0; m < lens.length; m++) {
         if (s <= lens[m]) {
           var f = s / lens[m];
@@ -154,45 +169,98 @@
     ctx.beginPath();
     if (ctx.roundRect) ctx.roundRect(x, y, w, h, r); else ctx.rect(x, y, w, h);
   }
-  var desks = [
+  function wallLine(pts, color, width) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width * dpr;
+    ctx.beginPath();
+    ctx.moveTo(X(pts[0][0]), Y(pts[0][1]));
+    for (var i = 1; i < pts.length; i++) ctx.lineTo(X(pts[i][0]), Y(pts[i][1]));
+    ctx.stroke();
+  }
+  function grid(x0) {
+    ctx.strokeStyle = 'rgba(255,255,255,.035)';
+    ctx.lineWidth = 1;
+    for (var gx = Math.ceil(x0); gx < W; gx++) { ctx.beginPath(); ctx.moveTo(X(gx), Y(WALL)); ctx.lineTo(X(gx), Y(H - WALL)); ctx.stroke(); }
+    for (var gy = 1; gy < H; gy++) { ctx.beginPath(); ctx.moveTo(X(Math.max(WALL, x0)), Y(gy)); ctx.lineTo(X(W - WALL), Y(gy)); ctx.stroke(); }
+  }
+  function desks(list) {
+    ctx.fillStyle = 'rgba(148,163,184,.07)';
+    ctx.strokeStyle = 'rgba(148,163,184,.14)';
+    ctx.lineWidth = 1;
+    list.forEach(function (d) { roundRect(X(d.x), Y(d.y), S(d.w), S(d.h), S(0.08)); ctx.fill(); ctx.stroke(); });
+  }
+  var DESKS_INDOOR = [
     { x: 2.1, y: 3.4, w: 1.5, h: 0.75 }, { x: 4.6, y: 3.4, w: 1.5, h: 0.75 },
     { x: 7.1, y: 3.4, w: 1.5, h: 0.75 }, { x: 4.6, y: 5.5, w: 1.5, h: 0.75 }
   ];
+  var DESKS_O2I = [
+    { x: 4.6, y: 2.3, w: 1.3, h: 0.7 }, { x: 7.3, y: 2.3, w: 1.3, h: 0.7 },
+    { x: 4.6, y: 4.6, w: 1.3, h: 0.7 }, { x: 7.3, y: 4.6, w: 1.3, h: 0.7 }
+  ];
 
-  function drawRoom() {
+  function drawIndoorBackdrop() {
+    grid(0);
+    desks(DESKS_INDOOR);
+    var D = M.DOOR;
+    wallLine([[WALL, D.y0], [WALL, WALL], [W - WALL, WALL], [W - WALL, H - WALL], [WALL, H - WALL], [WALL, D.y1]], 'rgba(148,163,184,.4)', 2);
+    label('door', WALL + 0.12, (D.y0 + D.y1) / 2, 'left', 'rgba(148,163,184,.5)');
+  }
+
+  function drawO2IBackdrop() {
+    var O = M.O2I, FX = O.FX;
+    // Street and sidewalk
+    ctx.fillStyle = '#080d1b';
+    ctx.fillRect(X(1.1), Y(0), S(1.3), S(H));
+    ctx.fillStyle = '#111a2f';
+    ctx.fillRect(X(2.4), Y(0), S(FX - 2.4), S(H));
+    ctx.save();
+    ctx.setLineDash([6 * dpr, 8 * dpr]);
+    wallLine([[O.LANE_X, 0], [O.LANE_X, H]], 'rgba(251,191,36,.35)', 1.2);
+    ctx.restore();
+    label('street', 1.75, H - 0.3, 'center', 'rgba(148,163,184,.5)');
+    label('sidewalk', 2.9, 0.3, 'center', 'rgba(148,163,184,.5)');
+    // Inside
+    grid(FX);
+    desks(DESKS_O2I);
+    var D = O.DOOR;
+    wallLine([[FX, WALL], [W - WALL, WALL], [W - WALL, D.y0]], 'rgba(148,163,184,.4)', 2);
+    wallLine([[W - WALL, D.y1], [W - WALL, H - WALL], [FX, H - WALL]], 'rgba(148,163,184,.4)', 2);
+    label('door', W - WALL - 0.14, (D.y0 + D.y1) / 2, 'right', 'rgba(148,163,184,.5)');
+    // Facade: concrete piers and glass windows
+    var spans = [], yPrev = WALL;
+    O.WINDOWS.forEach(function (w) { spans.push([yPrev, w[0], 'c']); spans.push([w[0], w[1], 'g']); yPrev = w[1]; });
+    spans.push([yPrev, H - WALL, 'c']);
+    spans.forEach(function (s) {
+      if (s[2] === 'c') wallLine([[FX, s[0]], [FX, s[1]]], '#64748b', 6);
+      else {
+        wallLine([[FX - 0.05, s[0]], [FX - 0.05, s[1]]], 'rgba(125,211,252,.55)', 1.4);
+        wallLine([[FX + 0.05, s[0]], [FX + 0.05, s[1]]], 'rgba(125,211,252,.55)', 1.4);
+      }
+    });
+    label('window', FX - 0.12, (O.WINDOWS[0][0] + O.WINDOWS[0][1]) / 2 - 0.9, 'right', 'rgba(125,211,252,.6)');
+    label('concrete', FX - 0.12, (O.WINDOWS[0][1] + O.WINDOWS[1][0]) / 2, 'right', 'rgba(148,163,184,.65)');
+  }
+
+  function drawScene() {
     var band = bands[sel.band];
     var e = world.evaluate(band, sel.ris, sel.mra);
-    var u = world.user, q = world.pred;
+    var A = world.ap, u = world.user, q = world.pred;
+    var o2i = world.scene === 'o2i';
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = '#0a1124';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    if (o2i) drawO2IBackdrop(); else drawIndoorBackdrop();
 
-    ctx.strokeStyle = 'rgba(255,255,255,.035)';
-    ctx.lineWidth = 1;
-    for (var gx = 1; gx < W; gx++) { ctx.beginPath(); ctx.moveTo(X(gx), Y(WALL)); ctx.lineTo(X(gx), Y(H - WALL)); ctx.stroke(); }
-    for (var gy = 1; gy < H; gy++) { ctx.beginPath(); ctx.moveTo(X(WALL), Y(gy)); ctx.lineTo(X(W - WALL), Y(gy)); ctx.stroke(); }
-    ctx.fillStyle = 'rgba(148,163,184,.07)';
-    ctx.strokeStyle = 'rgba(148,163,184,.14)';
-    desks.forEach(function (d) { roundRect(X(d.x), Y(d.y), S(d.w), S(d.h), S(0.08)); ctx.fill(); ctx.stroke(); });
-    ctx.strokeStyle = 'rgba(148,163,184,.4)';
-    ctx.lineWidth = 2 * dpr;
-    ctx.beginPath();
-    ctx.moveTo(X(WALL), Y(DOOR.y0));
-    ctx.lineTo(X(WALL), Y(WALL)); ctx.lineTo(X(W - WALL), Y(WALL));
-    ctx.lineTo(X(W - WALL), Y(H - WALL)); ctx.lineTo(X(WALL), Y(H - WALL));
-    ctx.lineTo(X(WALL), Y(DOOR.y1));
-    ctx.stroke();
-    label('door', WALL + 0.12, (DOOR.y0 + DOOR.y1) / 2, 'left', 'rgba(148,163,184,.5)');
-
-    var ang = Math.atan2(u.y - AP.y, u.x - AP.x), half = CONE[sel.band];
-    var reach = S(Math.hypot(u.x - AP.x, u.y - AP.y) + 0.6);
-    var g = ctx.createRadialGradient(X(AP.x), Y(AP.y), 0, X(AP.x), Y(AP.y), reach);
+    // Beam footprint: wide at sub-6, a pencil at mmWave
+    var ang = Math.atan2(u.y - A.y, u.x - A.x), half = CONE[sel.band];
+    var reach = S(Math.hypot(u.x - A.x, u.y - A.y) + 0.6);
+    var g = ctx.createRadialGradient(X(A.x), Y(A.y), 0, X(A.x), Y(A.y), reach);
     g.addColorStop(0, 'rgba(251,191,36,.22)');
     g.addColorStop(1, 'rgba(251,191,36,0)');
     ctx.fillStyle = g;
     ctx.beginPath();
-    ctx.moveTo(X(AP.x), Y(AP.y));
-    ctx.arc(X(AP.x), Y(AP.y), reach, ang - half, ang + half);
+    ctx.moveTo(X(A.x), Y(A.y));
+    ctx.arc(X(A.x), Y(A.y), reach, ang - half, ang + half);
     ctx.closePath();
     ctx.fill();
 
@@ -201,57 +269,84 @@
     var risShare = e.risDb === null ? 0 : db2lin(e.risDb) / total;
     var mraShare = e.mraDb === null ? 0 : db2lin(e.mraDb) / total;
 
-    var losAlpha = clamp((e.losDb + 5) / 30, 0, 1);
+    // Direct path: full strength up to the first obstruction, then faded by the loss
+    var dx = u.x - A.x, dy = u.y - A.y, len = Math.hypot(dx, dy);
+    var obst = [];
     if (world.losBlocker) {
       var b = world.losBlocker;
-      var dx = u.x - AP.x, dy = u.y - AP.y, len = Math.hypot(dx, dy);
-      var f = clamp((((b.x - AP.x) * dx + (b.y - AP.y) * dy) / len - PERSON_R) / len, 0, 1);
-      var hit = { x: AP.x + dx * f, y: AP.y + dy * f };
-      line([AP, hit], '#fbbf24', 1.6, 0.55);
-      if (losAlpha > 0.04) line([hit, u], '#fbbf24', 1.6, 0.55 * losAlpha);
-      var sev = band.block >= 20 ? '#f87171' : band.block >= 10 ? '#fb923c' : '#fbbf24';
-      ctx.save();
-      ctx.strokeStyle = sev; ctx.lineWidth = 2 * dpr;
-      var cx = X(hit.x), cy = Y(hit.y), r = 4 * dpr;
-      ctx.beginPath(); ctx.moveTo(cx - r, cy - r); ctx.lineTo(cx + r, cy + r); ctx.moveTo(cx + r, cy - r); ctx.lineTo(cx - r, cy + r); ctx.stroke();
-      ctx.restore();
-      var nx = -dy / len, ny = dx / len;
-      if (ny > 0) { nx = -nx; ny = -ny; }
-      var lx = hit.x + nx * 0.4, ly = hit.y + ny * 0.4;
+      var fb = clamp((((b.x - A.x) * dx + (b.y - A.y) * dy) / len - PERSON_R) / len, 0, 1);
+      obst.push({ f: fb, kind: 'block' });
+    }
+    if (o2i && world.cross) obst.push({ f: (world.cross.x - A.x) / dx, kind: world.cross.glass ? 'glass' : 'wall' });
+    obst.sort(function (a, c) { return a.f - c.f; });
+    var losAlpha = clamp((e.losDb + 5) / 30, 0, 1);
+    if (obst.length) {
+      var p0 = { x: A.x + dx * obst[0].f, y: A.y + dy * obst[0].f };
+      line([A, p0], '#fbbf24', 1.6, 0.55);
+      if (losAlpha > 0.04) line([p0, u], '#fbbf24', 1.6, 0.55 * losAlpha);
+    } else {
+      line([A, u], '#fbbf24', 1.6, 0.55);
+    }
+    var nx = -dy / len, ny = dx / len;
+    if (ny > 0) { nx = -nx; ny = -ny; }
+    obst.forEach(function (ob) {
+      var hp = { x: A.x + dx * ob.f, y: A.y + dy * ob.f };
+      var txt, col;
+      if (ob.kind === 'block') {
+        txt = '−' + Math.round(e.blockDb) + ' dB';
+        col = band.block >= 20 ? '#f87171' : band.block >= 10 ? '#fb923c' : '#fbbf24';
+        ctx.save();
+        ctx.strokeStyle = col; ctx.lineWidth = 2 * dpr;
+        var cx = X(hp.x), cy = Y(hp.y), r = 4 * dpr;
+        ctx.beginPath(); ctx.moveTo(cx - r, cy - r); ctx.lineTo(cx + r, cy + r); ctx.moveTo(cx + r, cy - r); ctx.lineTo(cx - r, cy + r); ctx.stroke();
+        ctx.restore();
+      } else {
+        var loss = ob.kind === 'glass' ? band.glass : band.concrete;
+        txt = (ob.kind === 'glass' ? 'glass −' : 'wall −') + Math.round(loss) + ' dB';
+        col = ob.kind === 'glass' ? 'rgba(125,211,252,.9)' : (loss >= 40 ? '#f87171' : '#fb923c');
+        ctx.beginPath(); ctx.arc(X(hp.x), Y(hp.y), 3.5 * dpr, 0, Math.PI * 2);
+        ctx.fillStyle = col; ctx.fill();
+      }
+      if (ob.kind !== 'block') {
+        // Facade loss: just inside the building, next to where the path crosses
+        label(txt, hp.x + 0.18, clamp(hp.y - 0.32, WALL + 0.8, H - WALL - 0.3), 'left', col);
+        return;
+      }
+      var lx = hp.x + nx * 0.4, ly = hp.y + ny * 0.4;
       var du = Math.hypot(lx - u.x, ly - u.y);
       if (du < 1.1) { var back = 1.1 - du + 0.25; lx -= dx / len * back; ly -= dy / len * back; }
       lx = clamp(lx, WALL + 0.4, W - WALL - 0.4);
       ly = clamp(ly, WALL + 0.7, H - WALL - 0.3);
-      label('−' + band.block * world.losCount + ' dB', lx, ly, nx >= 0 ? 'left' : 'right', sev);
-    } else {
-      line([AP, u], '#fbbf24', 1.6, 0.55);
-    }
+      label(txt, lx, ly, nx >= 0 ? 'left' : 'right', col);
+    });
 
-    var paths = [{ share: losShare, pts: [AP, u], color: '#fde68a' }];
+    var paths = [{ share: losShare, pts: [A, u], color: '#fde68a' }];
     if (sel.ris) {
       world.best.forEach(function (idx, rank) {
         var tl = world.tiles[idx];
-        var pts = [AP, { x: tl.x, y: tl.y + 0.12 }, u];
+        var pts = [A, { x: tl.ax, y: tl.ay }, u];
         line(pts, '#2dd4bf', rank === 0 ? 2.2 : 1.2, (rank === 0 ? 0.25 : 0.12) + (rank === 0 ? 0.65 : 0.25) * Math.sqrt(risShare));
         if (rank === 0) paths.push({ share: risShare, pts: pts, color: '#ccfbf1' });
       });
-      if (world.best.length) {
-        var top = world.tiles[world.best[0]];
-        line([{ x: top.x, y: top.y + 0.12 }, q], 'rgba(45,212,191,.45)', 1.2, 1, [3, 5]);
-      }
     }
     if (sel.mra && world.bestMra !== null) {
       var m = world.mra[world.bestMra];
-      var mp = [AP, { x: m.x - 0.1, y: m.y }, u];
+      var mp = [A, { x: m.ax, y: m.ay }, u];
       line(mp, '#a78bfa', 1.6, 0.2 + 0.6 * Math.sqrt(mraShare));
       paths.push({ share: mraShare, pts: mp, color: '#ede9fe' });
     }
     paths.sort(function (a, c) { return c.share - a.share; });
-    if (e.rate >= TARGET / 4 && paths[0].share > 0.05) packets(paths[0].pts, paths[0].color);
+    if (e.rate >= TARGET / 4 && paths[0].share > 0.05) {
+      packets(paths[0].pts, paths[0].color);
+      if (o2i) packets(paths[0].pts, '#fbbf24', true, 0.125);
+    }
 
-    var tw = 7.5 / (world.NT - 1) * 0.78;
+    // RIS tiles: along the top wall indoors, on the windows outdoors-to-indoor
+    var vert = world.tileOrient === 'v';
+    var tw = vert ? 0.14 : 7.5 / 17 * 0.78;
+    var th = vert ? (M.O2I.WINDOWS[0][1] - M.O2I.WINDOWS[0][0]) / 6 * 0.78 : 0.2;
     world.tiles.forEach(function (tl, i) {
-      var x = X(tl.x - tw / 2), y = Y(tl.y - 0.07), w = S(tw), h = S(0.2);
+      var x = X(tl.x - tw / 2), y = Y(tl.y - th / 2), w = S(tw), h = S(th);
       if (!sel.ris) {
         ctx.strokeStyle = 'rgba(148,163,184,.35)'; ctx.lineWidth = 1;
         ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
@@ -269,12 +364,16 @@
         ctx.restore();
       }
     });
-    label(sel.ris ? 'RIS tiles' : 'RIS tiles · off', 1.08, WALL + 0.52, 'left', sel.ris ? 'rgba(94,234,212,.85)' : 'rgba(148,163,184,.7)');
+    var risName = o2i ? 'RIS window' : 'RIS tiles';
+    var risCol = sel.ris ? 'rgba(94,234,212,.85)' : 'rgba(148,163,184,.7)';
+    if (o2i) label(sel.ris ? risName : risName + ' · off', M.O2I.FX + 0.22, WALL + 0.45, 'left', risCol);
+    else label(sel.ris ? risName : risName + ' · off', 1.08, WALL + 0.52, 'left', risCol);
 
+    // MRA slats
     world.mra.forEach(function (mm, i) {
       ctx.save();
       ctx.translate(X(mm.x), Y(mm.y));
-      ctx.rotate(-0.5);
+      ctx.rotate(mm.ang);
       if (!sel.mra) ctx.fillStyle = 'rgba(148,163,184,.3)';
       else if (mm.blocked) ctx.fillStyle = '#2a2f45';
       else {
@@ -285,9 +384,23 @@
       ctx.fillRect(-S(0.05), -S(0.28), S(0.1), S(0.56));
       ctx.restore();
     });
-    label(sel.mra ? 'MRA' : 'MRA · off', W - WALL - 0.42, 1.45, 'right', sel.mra ? 'rgba(196,181,253,.85)' : 'rgba(148,163,184,.7)');
+    var mraCol = sel.mra ? 'rgba(196,181,253,.85)' : 'rgba(148,163,184,.7)';
+    if (o2i) label(sel.mra ? 'MRA' : 'MRA · off', W - WALL - 0.3, WALL + 0.62, 'right', mraCol);
+    else label(sel.mra ? 'MRA' : 'MRA · off', W - WALL - 0.42, 1.45, 'right', mraCol);
 
-    world.people.forEach(function (p) {
+    // Cars (outdoors)
+    world.cars.forEach(function (c) {
+      var cw = M.O2I.CAR.w, ch = M.O2I.CAR.h;
+      ctx.fillStyle = '#334155';
+      roundRect(X(c.x - cw / 2), Y(c.y - ch / 2), S(cw), S(ch), S(0.14)); ctx.fill();
+      ctx.lineWidth = 1.5 * dpr; ctx.strokeStyle = 'rgba(203,213,225,.4)'; ctx.stroke();
+      ctx.fillStyle = 'rgba(148,163,184,.5)';
+      var wy = c.vy > 0 ? c.y + ch * 0.18 : c.y - ch * 0.18 - 0.22;
+      ctx.fillRect(X(c.x - cw * 0.32), Y(wy), S(cw * 0.64), S(0.22));
+    });
+
+    // People indoors and on the sidewalk
+    world.people.concat(world.walkers).forEach(function (p) {
       ctx.beginPath(); ctx.arc(X(p.x), Y(p.y), S(PERSON_R * 0.72), 0, Math.PI * 2);
       ctx.fillStyle = '#475569'; ctx.fill();
       ctx.lineWidth = 1.5 * dpr; ctx.strokeStyle = 'rgba(203,213,225,.35)'; ctx.stroke();
@@ -295,6 +408,7 @@
       ctx.fillStyle = '#94a3b8'; ctx.fill();
     });
 
+    // Where the user is predicted to be next (beams are steered there)
     if (sel.ris) {
       ctx.save();
       ctx.setLineDash([3 * dpr, 4 * dpr]);
@@ -317,16 +431,17 @@
     ctx.save();
     ctx.shadowColor = '#fbbf24'; ctx.shadowBlur = 12 * dpr;
     ctx.fillStyle = '#fbbf24';
-    roundRect(X(AP.x - 0.17), Y(AP.y - 0.17), S(0.34), S(0.34), S(0.07));
+    roundRect(X(A.x - 0.17), Y(A.y - 0.17), S(0.34), S(0.34), S(0.07));
     ctx.fill();
     ctx.restore();
-    label('AP · ' + band.carrier, AP.x + 0.32, AP.y + 0.3, 'left', '#fde68a');
+    if (o2i) label(world.apLabel + ' · ' + band.carrier, A.x - 0.15, A.y + 0.45, 'left', '#fde68a');
+    else label(world.apLabel + ' · ' + band.carrier, A.x + 0.32, A.y + 0.3, 'left', '#fde68a');
 
     var occ = world.occupancy();
     label('occupancy ' + occ + ' · ' + (occ <= 2 ? 'low' : occ <= 4 ? 'medium' : 'high'), W - WALL - 0.2, H - WALL - 0.28, 'right', 'rgba(148,163,184,.75)');
   }
 
-  // ---------- Timeline strip: the whole scenario, playhead, time below target ----------
+  // ---------- Timeline strip ----------
   var hoverI = null;
   function stripGeom() {
     var w = strip.width, h = strip.height;
@@ -341,13 +456,12 @@
   }
   function drawStrip() {
     if (!tctx || !strip.width) return;
-    var g = stripGeom(), data = series[selKey()];
+    var g = stripGeom(), series = cur().series[selKey()];
     tctx.clearRect(0, 0, g.w, g.h);
 
-    // Time below target: a tint behind the plot and a solid band underneath
     var start = -1;
     for (var i = 0; i <= N; i++) {
-      var below = i < N && data[i] < TARGET;
+      var below = i < N && series[i] < TARGET;
       if (below && start < 0) start = i;
       if (!below && start >= 0) {
         var x0 = g.x(start), x1 = Math.max(g.x(i - 1), x0 + 2 * dpr);
@@ -376,19 +490,20 @@
       tctx.lineWidth = 2 * dpr;
       tctx.lineJoin = 'round';
       tctx.beginPath();
-      for (var j = from; j <= to; j++) { if (j === from) tctx.moveTo(g.x(j), g.y(data[j])); else tctx.lineTo(g.x(j), g.y(data[j])); }
+      for (var j = from; j <= to; j++) { if (j === from) tctx.moveTo(g.x(j), g.y(series[j])); else tctx.lineTo(g.x(j), g.y(series[j])); }
       tctx.stroke();
       tctx.restore();
     }
     path(0, k - 1, 1);
     path(k - 1, N - 1, 0.32);
 
-    events.forEach(function (ev) {
+    cur().events.forEach(function (ev) {
       var ex = g.x(ev.i), s = 4 * dpr, cy = g.evH / 2 + 1 * dpr;
       tctx.fillStyle = ev.i < k ? 'rgba(203,213,225,.9)' : 'rgba(203,213,225,.35)';
       tctx.beginPath();
-      if (ev.dir > 0) { tctx.moveTo(ex - s, cy + s); tctx.lineTo(ex + s, cy + s); tctx.lineTo(ex, cy - s); }
-      else { tctx.moveTo(ex - s, cy - s); tctx.lineTo(ex + s, cy - s); tctx.lineTo(ex, cy + s); }
+      if (ev.kind === 'in') { tctx.moveTo(ex - s, cy + s); tctx.lineTo(ex + s, cy + s); tctx.lineTo(ex, cy - s); }
+      else if (ev.kind === 'out') { tctx.moveTo(ex - s, cy - s); tctx.lineTo(ex + s, cy - s); tctx.lineTo(ex, cy + s); }
+      else tctx.rect(ex - s * 0.8, cy - s * 0.8, s * 1.6, s * 1.6);
       tctx.closePath(); tctx.fill();
     });
 
@@ -405,21 +520,20 @@
     tctx.textAlign = 'right';
     tctx.textBaseline = 'top';
     tctx.fillText(TARGET + ' Gbps target', g.w - g.padR, g.y(TARGET) + 2 * dpr);
-    tctx.textBaseline = 'top';
     tctx.fillText(YMAX + ' Gbps', g.w - g.padR, g.plotT);
 
     var px = g.x(k - 1);
     tctx.fillStyle = '#f8fafc';
     tctx.fillRect(px - 0.75 * dpr, g.plotT - 3 * dpr, 1.5 * dpr, g.belowY + g.belowH - g.plotT + 3 * dpr);
-    tctx.beginPath(); tctx.arc(px, g.y(data[k - 1]), 4.5 * dpr, 0, Math.PI * 2);
-    tctx.fillStyle = data[k - 1] >= TARGET ? LINE : BELOW; tctx.fill();
+    tctx.beginPath(); tctx.arc(px, g.y(series[k - 1]), 4.5 * dpr, 0, Math.PI * 2);
+    tctx.fillStyle = series[k - 1] >= TARGET ? LINE : BELOW; tctx.fill();
     tctx.lineWidth = 2 * dpr; tctx.strokeStyle = '#0d1426'; tctx.stroke();
 
     if (hoverI !== null) {
       var hi = clamp(hoverI, 0, N - 1), hx = g.x(hi);
       tctx.strokeStyle = 'rgba(226,232,240,.55)'; tctx.lineWidth = 1;
       tctx.beginPath(); tctx.moveTo(hx, g.plotT); tctx.lineTo(hx, g.belowY + g.belowH); tctx.stroke();
-      var v = data[hi];
+      var v = series[hi];
       var txt = fmtTime((hi + 1) * DT) + ' · ' + v.toFixed(1) + ' Gbps · ' + (v >= TARGET ? 'meets' : 'below') + ' target · click to jump';
       tctx.font = '600 ' + Math.round(11 * dpr) + 'px Inter, system-ui, sans-serif';
       var tw = tctx.measureText(txt).width + 14 * dpr;
@@ -440,6 +554,7 @@
 
   // ---------- Text readouts ----------
   function q(s) { return document.querySelector(s); }
+  function qa(s) { return Array.prototype.slice.call(document.querySelectorAll(s)); }
   var el = {
     time: q('[data-sim="time"]'), rate: q('[data-sim="rate"]'), status: q('[data-sim="status"]'),
     takeaway: q('[data-sim="takeaway"]'), play: q('[data-sim="play"]'), restart: q('[data-sim="restart"]')
@@ -456,76 +571,85 @@
       el.status.className = 'sim-status ' + (ok ? 'is-ok' : 'is-below');
       el.status.textContent = ok ? '✓ Meets ' + TARGET + ' Gbps target' : '✕ Below ' + TARGET + ' Gbps target';
     }
-    if (strip) strip.setAttribute('aria-valuenow', String(Math.round(k * DT)));
-    if (strip) strip.setAttribute('aria-valuetext', fmtTime(k * DT) + ' of ' + fmtTime(DURATION));
+    if (strip) {
+      strip.setAttribute('aria-valuenow', String(Math.round(k * DT)));
+      strip.setAttribute('aria-valuetext', fmtTime(k * DT) + ' of ' + fmtTime(DURATION));
+    }
   }
   function updateTakeaway() {
     if (!el.takeaway) return;
+    var st = cur().stats;
     var b = bands[sel.band], cid = comboId(sel.ris, sel.mra);
-    var none = stats[sel.band + '-none'].belowS, both = stats[sel.band + '-both'].belowS, cur = stats[selKey()].belowS;
+    var none = st[sel.band + '-none'].belowS, both = st[sel.band + '-both'].belowS, now = st[selKey()].belowS;
     var t;
-    if (none >= DURATION - 0.01) {
+    if (none >= DURATION - 0.01 && now >= DURATION - 0.01) {
       t = b.label + ' never reaches ' + TARGET + ' Gbps: ' + Math.round(b.bw * 1000) + ' MHz of spectrum caps it near ' + (b.bw * 7.5).toFixed(2) + ' Gbps, with or without surfaces.';
     } else if (cid === 'none') {
-      t = 'Without surfaces, ' + b.label + ' is below ' + TARGET + ' Gbps for ' + fmtS(none) + ' of these 2 minutes. With RIS + MRA: ' + fmtS(both) + '.';
+      t = (sel.scene === 'o2i' ? 'From the street, the façade decides. Without surfaces, ' : 'Without surfaces, ') +
+        b.label + ' is below ' + TARGET + ' Gbps for ' + fmtS(none) + ' of these 2 minutes. With RIS + MRA: ' + fmtS(both) + '.';
     } else {
-      var ratio = cur > 0 ? none / cur : Infinity;
-      t = b.label + ' with ' + comboOf(cid).label + ': below ' + TARGET + ' Gbps for ' + fmtS(cur) + ' of 2 minutes, versus ' + fmtS(none) + ' without surfaces' +
+      var ratio = now > 0 ? none / now : Infinity;
+      t = b.label + ' with ' + comboOf(cid).label + ': below ' + TARGET + ' Gbps for ' + fmtS(now) + ' of 2 minutes, versus ' + fmtS(none) + ' without surfaces' +
         (isFinite(ratio) ? ' (' + (ratio >= 10 ? Math.round(ratio) : ratio.toFixed(1)) + '× less).' : '.');
     }
     el.takeaway.textContent = t;
   }
-
-  // ---------- Results section ----------
-  function fillResults() {
-    var head = q('[data-impact="headline"]'), sub = q('[data-impact="sub"]'), db = q('[data-impact="dumbbell"]');
-    var f0 = stats['fr3-none'].belowS, f1 = stats['fr3-both'].belowS;
-    var m0 = stats['mmw-none'].belowS, m1 = stats['mmw-both'].belowS;
-    var ratio = f1 > 0 ? Math.round(f0 / f1) : null;
-    if (head) head.textContent = ratio ? 'RIS + MRA cut FR3’s time below ' + TARGET + ' Gbps about ' + ratio + '×' : 'RIS + MRA keep FR3 above ' + TARGET + ' Gbps throughout';
-    if (sub) sub.textContent = 'In the same 2-minute scenario, FR3 falls below ' + TARGET + ' Gbps for ' + fmtS(f0) + ' without surfaces and ' + fmtS(f1) +
-      ' with RIS + MRA. mmWave improves from ' + fmtS(m0) + ' to ' + fmtS(m1) + ', while sub-6 never reaches ' + TARGET + ' Gbps.';
-
-    if (db) {
-      var max = 0;
-      ['fr3', 'mmw'].forEach(function (bk) { max = Math.max(max, stats[bk + '-none'].belowS); });
-      max = Math.ceil(max / 5) * 5;
-      var html = '';
-      M.BANDS.forEach(function (b) {
-        var a = stats[b.key + '-none'].belowS, z = stats[b.key + '-both'].belowS;
-        html += '<div class="db-row"><div class="db-label">' + b.label + '<small>' + b.carrier + '</small></div><div class="db-track">';
-        if (a > max) {
-          html += '<span class="db-off">Below ' + TARGET + ' Gbps for all ' + fmtS(a) + ', with or without surfaces: bandwidth is the limit</span>';
-        } else {
-          var pa = a / max * 100, pz = z / max * 100;
-          html += '<span class="db-line" style="left:' + pz.toFixed(2) + '%;width:' + (pa - pz).toFixed(2) + '%"></span>' +
-            '<span class="db-dot before" style="left:' + pa.toFixed(2) + '%" title="' + b.label + ', no surfaces: ' + fmtS(a) + ' below ' + TARGET + ' Gbps"></span>' +
-            '<span class="db-dot after" style="left:' + pz.toFixed(2) + '%" title="' + b.label + ', RIS + MRA: ' + fmtS(z) + ' below ' + TARGET + ' Gbps"></span>' +
-            '<span class="db-val before" style="left:' + pa.toFixed(2) + '%">' + fmtS(a) + '</span>' +
-            '<span class="db-val after" style="left:' + pz.toFixed(2) + '%">' + fmtS(z) + '</span>';
-        }
-        html += '</div></div>';
-      });
-      html += '<div class="db-row db-axis" aria-hidden="true"><div class="db-label"></div><div class="db-track">';
-      for (var s = 0; s <= max; s += 5) html += '<span style="left:' + (s / max * 100).toFixed(2) + '%">' + s + ' s</span>';
-      html += '</div></div>';
-      db.innerHTML = html;
-    }
-
-    Array.prototype.forEach.call(document.querySelectorAll('[data-sim-cell]'), function (cell) {
-      var st = stats[cell.getAttribute('data-sim-cell')];
-      if (!st) return;
-      cell.querySelector('.pct').textContent = fmtS(st.belowS);
-      cell.querySelector('.avg').textContent = st.avg.toFixed(1) + ' Gbps';
-      var frac = st.belowS / DURATION, ok = cell.querySelector('.cbar .ok'), bl = cell.querySelector('.cbar .below');
+  function fillTable() {
+    var st = cur().stats;
+    qa('[data-sim-cell]').forEach(function (cell) {
+      var s = st[cell.getAttribute('data-sim-cell')];
+      if (!s) return;
+      cell.querySelector('.pct').textContent = fmtS(s.belowS);
+      cell.querySelector('.avg').textContent = s.avg.toFixed(1) + ' Gbps';
+      var frac = s.belowS / DURATION, ok = cell.querySelector('.cbar .ok'), bl = cell.querySelector('.cbar .below');
       if (ok && bl) {
         ok.style.flex = (1 - frac) + ' 1 0'; bl.style.flex = frac + ' 1 0';
         ok.style.display = frac >= 1 ? 'none' : '';
         bl.style.display = frac <= 0 ? 'none' : '';
         bl.style.minWidth = frac > 0 ? '3px' : '0';
       }
-      cell.title = cell.querySelector('.sr-only').textContent.replace(/: $/, '') + ': below ' + TARGET + ' Gbps for ' + fmtS(st.belowS) + ' of 2 minutes, ' + st.avg.toFixed(1) + ' Gbps on average';
+      cell.title = cell.querySelector('.sr-only').textContent.replace(/: $/, '') + ': below ' + TARGET + ' Gbps for ' + fmtS(s.belowS) + ' of 2 minutes, ' + s.avg.toFixed(1) + ' Gbps on average';
     });
+  }
+
+  // ---------- Results section (both scenarios) ----------
+  function dumbbell(sceneKey, title) {
+    var st = data[sceneKey].stats, max = 0;
+    ['fr3', 'mmw'].forEach(function (bk) { max = Math.max(max, st[bk + '-none'].belowS); });
+    max = Math.max(5, Math.ceil(max / 5) * 5);
+    var step = max <= 25 ? 5 : max <= 60 ? 15 : 30;
+    max = Math.ceil(max / step) * step;
+    var html = '<div class="db-group"><p class="db-group-title">' + title + '</p>';
+    M.BANDS.forEach(function (b) {
+      var a = st[b.key + '-none'].belowS, z = st[b.key + '-both'].belowS;
+      html += '<div class="db-row"><div class="db-label">' + b.label + '<small>' + b.carrier + '</small></div><div class="db-track">';
+      if (a > max) {
+        html += '<span class="db-off">Below ' + TARGET + ' Gbps for all ' + fmtS(a) + ', with or without surfaces: bandwidth is the limit</span>';
+      } else {
+        var pa = a / max * 100, pz = z / max * 100;
+        html += '<span class="db-line" style="left:' + pz.toFixed(2) + '%;width:' + (pa - pz).toFixed(2) + '%"></span>' +
+          '<span class="db-dot before" style="left:' + pa.toFixed(2) + '%" title="' + b.label + ', no surfaces: ' + fmtS(a) + ' below ' + TARGET + ' Gbps"></span>' +
+          '<span class="db-dot after" style="left:' + pz.toFixed(2) + '%" title="' + b.label + ', RIS + MRA: ' + fmtS(z) + ' below ' + TARGET + ' Gbps"></span>' +
+          '<span class="db-val before" style="left:' + pa.toFixed(2) + '%">' + fmtS(a) + '</span>' +
+          '<span class="db-val after" style="left:' + pz.toFixed(2) + '%">' + fmtS(z) + '</span>';
+      }
+      html += '</div></div>';
+    });
+    html += '<div class="db-row db-axis" aria-hidden="true"><div class="db-label"></div><div class="db-track">';
+    for (var s = 0; s <= max; s += step) html += '<span style="left:' + (s / max * 100).toFixed(2) + '%">' + s + ' s</span>';
+    html += '</div></div></div>';
+    return html;
+  }
+  function fillResults() {
+    var head = q('[data-impact="headline"]'), sub = q('[data-impact="sub"]'), db = q('[data-impact="dumbbell"]');
+    var I = data.indoor.stats, O = data.o2i.stats;
+    var ri = I['fr3-both'].belowS > 0 ? Math.round(I['fr3-none'].belowS / I['fr3-both'].belowS) : null;
+    var ro = O['fr3-both'].belowS > 0 ? Math.round(O['fr3-none'].belowS / O['fr3-both'].belowS) : null;
+    if (head) head.textContent = (ri && ro) ? 'RIS + MRA cut FR3’s time below ' + TARGET + ' Gbps about ' + ri + '× indoors and ' + ro + '× from the street' : 'RIS + MRA keep FR3 above ' + TARGET + ' Gbps far more of the time';
+    if (sub) sub.textContent = 'Indoors, FR3 falls below ' + TARGET + ' Gbps for ' + fmtS(I['fr3-none'].belowS) + ' of 2 minutes without surfaces and ' + fmtS(I['fr3-both'].belowS) +
+      ' with them. From the street, the façade decides: FR3 and mmWave are both below ' + TARGET + ' Gbps for about ' + fmtS(O['fr3-none'].belowS) +
+      ' without surfaces, and a RIS on the windows brings FR3 down to ' + fmtS(O['fr3-both'].belowS) + '. Sub-6 never reaches ' + TARGET + ' Gbps.';
+    if (db) db.innerHTML = dumbbell('indoor', 'Indoor') + dumbbell('o2i', 'Outdoor ↔ indoor');
   }
 
   // ---------- Controls ----------
@@ -533,12 +657,15 @@
     var r = document.querySelector('input[name="' + name + '"][value="' + value + '"]');
     if (r) r.checked = true;
   }
+  function applySceneText() {
+    qa('[data-scene-show]').forEach(function (n) { n.hidden = n.getAttribute('data-scene-show') !== sel.scene; });
+  }
   function select(band, ris, mra) {
     sel.band = band; sel.ris = ris; sel.mra = mra;
     check('sim-band', band);
     check('sim-ris', ris ? 'on' : 'off');
     check('sim-mra', mra ? 'on' : 'off');
-    Array.prototype.forEach.call(document.querySelectorAll('[data-sim-cell]'), function (cell) {
+    qa('[data-sim-cell]').forEach(function (cell) {
       cell.setAttribute('aria-pressed', String(cell.getAttribute('data-sim-cell') === selKey()));
     });
     glow(1);
@@ -546,16 +673,30 @@
     updateUi(true);
     render();
   }
-  Array.prototype.forEach.call(document.querySelectorAll('input[name="sim-band"]'), function (inp) {
+  function selectScene(scene) {
+    if (!SCENES[scene]) return;
+    sel.scene = scene;
+    check('sim-scene', scene);
+    world = null; hoverI = null;
+    seek(1);
+    applySceneText();
+    fillTable();
+    select(sel.band, sel.ris, sel.mra);
+    kick();
+  }
+  qa('input[name="sim-scene"]').forEach(function (inp) {
+    inp.addEventListener('change', function () { if (inp.checked) selectScene(inp.value); });
+  });
+  qa('input[name="sim-band"]').forEach(function (inp) {
     inp.addEventListener('change', function () { if (inp.checked) select(inp.value, sel.ris, sel.mra); });
   });
-  Array.prototype.forEach.call(document.querySelectorAll('input[name="sim-ris"]'), function (inp) {
+  qa('input[name="sim-ris"]').forEach(function (inp) {
     inp.addEventListener('change', function () { if (inp.checked) select(sel.band, inp.value === 'on', sel.mra); });
   });
-  Array.prototype.forEach.call(document.querySelectorAll('input[name="sim-mra"]'), function (inp) {
+  qa('input[name="sim-mra"]').forEach(function (inp) {
     inp.addEventListener('change', function () { if (inp.checked) select(sel.band, sel.ris, inp.value === 'on'); });
   });
-  Array.prototype.forEach.call(document.querySelectorAll('[data-sim-cell]'), function (cell) {
+  qa('[data-sim-cell]').forEach(function (cell) {
     cell.addEventListener('click', function () {
       var p = cell.getAttribute('data-sim-cell').split('-'), c = comboOf(p[1]);
       select(p[0], c.ris, c.mra);
@@ -600,7 +741,7 @@
 
   // ---------- Loop ----------
   var rafId = null, last = null, acc = 0, onScreen = true;
-  function render() { drawRoom(); drawStrip(); }
+  function render() { drawScene(); drawStrip(); }
   function frame(now) {
     rafId = null;
     var real = last === null ? 0 : Math.min(0.1, (now - last) / 1000);
@@ -620,6 +761,8 @@
 
   seek(1);
   fillResults();
+  fillTable();
+  applySceneText();
   resize();
   select(sel.band, sel.ris, sel.mra);
   setPlayUi();

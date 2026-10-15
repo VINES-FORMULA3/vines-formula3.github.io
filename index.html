@@ -32,9 +32,18 @@ scripts:
       <div class="lab-head">
         <div>
           <p class="lab-kicker">Try it</p>
-          <h2 id="lab-title">What do people moving through a room do to a 6G link?</h2>
+          <h2 id="lab-title"><span data-scene-show="indoor">What do people moving through a room do to a 6G link?</span><span data-scene-show="o2i" hidden>Can a 6G link reach between the street and a user indoors?</span></h2>
         </div>
-        <span class="lab-badge">Illustrative model</span>
+        <div class="lab-head-right">
+          <fieldset class="seg seg-scene">
+            <legend class="sr-only">Scenario</legend>
+            <div class="seg-opts">
+              <label><input type="radio" name="sim-scene" value="indoor" checked><span>Indoor</span></label>
+              <label><input type="radio" name="sim-scene" value="o2i"><span>Outdoor ↔ indoor</span></label>
+            </div>
+          </fieldset>
+          <span class="lab-badge">Illustrative model</span>
+        </div>
       </div>
 
       <div class="lab-grid">
@@ -129,13 +138,14 @@ scripts:
               <li><i class="lg-target"></i>2 Gbps target</li>
               <li><i class="lg-below"></i>Below target</li>
               <li><i class="lg-ev">▲▼</i>Person enters / leaves</li>
+              <li data-scene-show="o2i" hidden><i class="lg-car"></i>Car passes</li>
             </ul>
           </div>
           <canvas id="pwe-strip" tabindex="0" role="slider" aria-label="Scenario timeline. Arrow keys move, space plays or pauses." aria-valuemin="0" aria-valuemax="120" aria-valuenow="0"></canvas>
         </div>
       </div>
 
-      <figcaption class="lab-caption">A fixed 2-minute scenario: the same people and the same moves for every option, so the comparison is fair. Illustrative model, not measurements. It assumes a person in the way costs about 4 dB at sub-6, 16 dB at FR3, and 28 dB at mmWave, and that bandwidth grows with frequency. Grey dots are people; crossed tiles are shadowed and excluded; the dashed ring is where the user is predicted to be next.</figcaption>
+      <figcaption class="lab-caption"><span data-scene-show="indoor">A fixed 2-minute scenario: the same people and the same moves for every option, so the comparison is fair. Illustrative model, not measurements. It assumes a person in the way costs about 4 dB at sub-6, 16 dB at FR3, and 28 dB at mmWave, and that bandwidth grows with frequency. Grey dots are people; crossed tiles are shadowed and excluded; the dashed ring is where the user is predicted to be next.</span><span data-scene-show="o2i" hidden>A fixed 2-minute scenario with the same people, cars, and moves for every option. Illustrative model, not measurements: façade losses follow 3GPP TR 38.901 (glass ≈ 3 / 5 / 8 dB, concrete ≈ 19 / 65 / 117 dB at sub-6 / FR3 / mmWave); the RIS is assumed to be a transmissive panel on the windows with 3 dB insertion loss in place of the glass; a car blocks about 1.5× as much as a person. The losses are the same in both directions, so this holds for the downlink and the uplink. Grey dots are people; crossed tiles are shadowed and excluded.</span></figcaption>
     </figure>
   </div>
 </section>
@@ -151,10 +161,10 @@ scripts:
       </div>
       <figure class="dumbbell-card">
         <figcaption>
-          <span class="db-title">Time below 2 Gbps in the 2-minute scenario</span>
+          <span class="db-title">Time below 2 Gbps in each 2-minute scenario</span>
           <span class="db-legend"><span><i class="db-key before"></i>No surfaces</span><span><i class="db-key after"></i>RIS + MRA</span></span>
         </figcaption>
-        <div class="dumbbell" data-impact="dumbbell" role="img" aria-label="Dumbbell chart. Time below 2 Gbps in the scenario for each band, without surfaces and with RIS plus MRA. Values are listed in the table in the interactive panel above."></div>
+        <div class="dumbbell" data-impact="dumbbell" role="img" aria-label="Dumbbell charts for the indoor and outdoor-to-indoor scenarios. Time below 2 Gbps for each band, without surfaces and with RIS plus MRA. Values are listed in the table in the interactive panel above."></div>
       </figure>
     </div>
   </div>
