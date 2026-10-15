@@ -2,7 +2,7 @@
 
 Project website for **FORMULA3: Framework for Optimal Resource Management Using Generalizable AI in FR3 Dynamic Programmable Wireless Environments**, an NSF–Research Council of Finland VINES project (NSF Award Nos. 2549087 and 2549088; Research Council of Finland Decision Nos. 380594 and 380600).
 
-Live site: https://vines-formula3.github.io/website/
+Live site: https://vines-formula3.github.io/
 
 The site is built with Jekyll by GitHub Pages straight from the `main` branch. There is no build step to run: commit to `main` and the site updates within a minute or two.
 
@@ -44,4 +44,4 @@ bundle install
 bundle exec jekyll serve
 ```
 
-Then open http://localhost:4000/website/.
+Then open http://localhost:4000/.

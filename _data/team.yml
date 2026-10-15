@@ -15,11 +15,11 @@
 investigators:
   - name: Muhammad Ismail
     institution: tntech
-    title: ""
+    title: Associate Professor of Computer Science; Director, Cybersecurity Education, Research and Outreach Center (CEROC)
     expertise: AI-enabled resource management and generalizable AI under concept drift.
     focus: Coordinates the project. Leads surface channel prediction, shadowed-surface exclusion, continual learning, and end-to-end evaluation.
     leads: [T2.1, T2.2, T3.2, T4.4]
-    url: ""
+    url: https://www.tntech.edu/directory/ceroc/muhammad-ismail.php
     photo: ""
 
   - name: Sabit Ekin
@@ -33,29 +33,29 @@ investigators:
 
   - name: Ted Rappaport
     institution: nyu
-    title: ""
+    title: David Lee/Ernst Weber Professor of Electrical Engineering, NYU Tandon School of Engineering; Founding Director, NYU WIRELESS
     expertise: FR3 and high-frequency propagation measurements and channel modeling.
     focus: Advises the FR3 measurement campaign, channel modeling, and validation of the measured and synthetic data.
     leads: [T1.1, T4.1]
-    url: ""
+    url: https://wireless.engineering.nyu.edu/tedrappaport/
     photo: ""
 
   - name: Ertugrul Basar
     institution: tampere
-    title: ""
+    title: Professor of Wireless Systems; Head, Wireless Systems Group, Tampere Wireless Research Center
     expertise: Reconfigurable intelligent surface (RIS) design, deployment, configuration, channel measurement, and modeling.
     focus: Leads interference-aware user assignment and surface configuration, and their evaluation. Hosts the FR3 RIS testbed at Tampere.
     leads: [T2.3, T4.2]
-    url: ""
+    url: https://www.tuni.fi/en/people/ertugrul-basar
     photo: ""
 
   - name: Risto Wichman
     institution: aalto
-    title: ""
+    title: Professor, Department of Information and Communications Engineering, School of Electrical Engineering
     expertise: AI-enabled beamforming and integrated sensing and communication (ISAC).
     focus: Leads the ISAC-driven context-awareness framework and the evaluation of AI adaptation strategies.
     leads: [T3.1, T4.3]
-    url: ""
+    url: https://www.aalto.fi/en/people/risto-wichman
     photo: ""
 
 # Postdocs and students. Add entries as people join, for example:
