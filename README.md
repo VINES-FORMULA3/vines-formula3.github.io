@@ -18,7 +18,7 @@ Most updates mean editing one file. You can do it in the GitHub web editor.
 | Datasets | `_data/datasets.yml` | Set `status: released` and fill in `link` (plus `doi` and `license`) when a dataset goes public. |
 | Timeline | `_data/timeline.yml` | `span: [start, end]` in half-year periods 1–6. |
 | Partners | `_data/partners.yml` | Logos in `assets/img/logos/`. |
-| Hero animation assumptions | `assets/js/pwe-model.js` → `BANDS` (bandwidth, blockage loss per person, surface losses); target line in `assets/js/pwe-sim.js` → `TARGET` | Illustrative model, not measurements. |
+| Hero animation assumptions | `assets/js/pwe-model.js` → `BANDS` (bandwidth, blockage loss per person, surface losses); in `assets/js/pwe-sim.js`: `TARGET` (2 Gbps line), `SEED` and `DURATION` (the fixed 2-minute scenario) | Illustrative model, not measurements. The results section and comparison table are computed from this scenario on page load. |
 | Funding text | `_config.yml` → `awards` (NSF) and `rcf_awards` (Research Council of Finland), plus `_includes/footer.html` | |
 
 Longer pages (`research.html`, `outreach.html`, `index.html`) are HTML with a small front-matter header.
