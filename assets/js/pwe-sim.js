@@ -27,7 +27,7 @@
   // (the panel around the canvas follows the same switch in site.css).
   var PALETTES = {
     light: {
-      bg: '#f5f7fb', grid: 'rgba(15,23,42,.05)', deskFill: 'rgba(100,116,139,.10)', deskStroke: 'rgba(100,116,139,.32)', deskText: '#64748b',
+      bg: '#f5f7fb', grid: 'rgba(15,23,42,.05)', deskFill: 'rgba(100,116,139,.2)', deskStroke: 'rgba(71,85,105,.5)', deskText: '#475569',
       wall: '#475569', text: '#475569', dim: '#64748b', status: '#5b6678',
       street: '#d3dae5', sidewalk: '#fbfcfe', building: '#e2e8f0', lane: 'rgba(180,83,9,.55)', facade: '#475569',
       glass: '#0284c7', glassText: '#0369a1', concreteText: '#475569',
