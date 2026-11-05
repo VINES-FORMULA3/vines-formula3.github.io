@@ -27,12 +27,12 @@
   // (the panel around the canvas follows the same switch in site.css).
   var PALETTES = {
     light: {
-      bg: '#f5f7fb', grid: 'rgba(15,23,42,.05)', deskFill: 'rgba(100,116,139,.10)', deskStroke: 'rgba(100,116,139,.32)',
+      bg: '#f5f7fb', grid: 'rgba(15,23,42,.05)', deskFill: 'rgba(100,116,139,.10)', deskStroke: 'rgba(100,116,139,.32)', deskText: '#64748b',
       wall: '#475569', text: '#475569', dim: '#64748b', status: '#5b6678',
       street: '#d3dae5', sidewalk: '#fbfcfe', building: '#e2e8f0', lane: 'rgba(180,83,9,.55)', facade: '#475569',
       glass: '#0284c7', glassText: '#0369a1', concreteText: '#475569',
       treeFill: 'rgba(22,163,74,.14)', treeStroke: 'rgba(22,163,74,.6)', treeCore: 'rgba(22,163,74,.75)', treeMark: '#15803d',
-      cone: '217,119,6', coneA: 0.16, los: '#d97706', sev: ['#dc2626', '#c2410c', '#a16207'],
+      cone: '180,83,9', coneA: 0.2, los: '#b45309', sev: ['#dc2626', '#c2410c', '#a16207'],
       pkLos: '#78350f', pkRis: '#134e4a', pkMra: '#4c1d95', pkUp: '#f59e0b',
       ris: '#0d9488', risRgb: '13,148,136', tileOff: 'rgba(71,85,105,.5)', tileBlocked: '#e2e8f0', tileCross: 'rgba(71,85,105,.5)',
       risLabel: '#0f766e', offLabel: '#64748b',
@@ -46,7 +46,7 @@
       sHover: 'rgba(15,23,42,.4)', sTipBg: 'rgba(15,23,42,.92)', sTipText: '#f8fafc'
     },
     dark: {
-      bg: '#16213a', grid: 'rgba(255,255,255,.045)', deskFill: 'rgba(148,163,184,.12)', deskStroke: 'rgba(148,163,184,.3)',
+      bg: '#16213a', grid: 'rgba(255,255,255,.045)', deskFill: 'rgba(148,163,184,.12)', deskStroke: 'rgba(148,163,184,.3)', deskText: 'rgba(203,213,225,.7)',
       wall: 'rgba(203,213,225,.7)', text: 'rgba(214,222,235,.92)', dim: 'rgba(203,213,225,.72)', status: 'rgba(203,213,225,.85)',
       street: '#0c1426', sidewalk: '#283860', building: '#1a243d', lane: 'rgba(251,191,36,.5)', facade: '#94a3b8',
       glass: 'rgba(125,211,252,.8)', glassText: 'rgba(125,211,252,.92)', concreteText: 'rgba(203,213,225,.85)',
@@ -152,7 +152,7 @@
   function fmtS(s) { return (s >= 10 ? s.toFixed(0) : s.toFixed(1)) + ' s'; }
 
   // ---------- Scene drawing ----------
-  var dpr = 1, scale = 1, ox = 0, oy = 0, phase = 0;
+  var dpr = 1, scale = 1, ox = 0, oy = 0, phase = 0, namedP = null;
   function resize() {
     dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = Math.round(wrap.clientWidth * dpr);
@@ -230,11 +230,13 @@
     for (var gx = Math.ceil(x0); gx < W; gx++) { ctx.beginPath(); ctx.moveTo(X(gx), Y(WALL)); ctx.lineTo(X(gx), Y(H - WALL)); ctx.stroke(); }
     for (var gy = 1; gy < H; gy++) { ctx.beginPath(); ctx.moveTo(X(Math.max(WALL, x0)), Y(gy)); ctx.lineTo(X(W - WALL), Y(gy)); ctx.stroke(); }
   }
-  function desks(list) {
+  function desks(list, named) {
     ctx.fillStyle = P.deskFill;
     ctx.strokeStyle = P.deskStroke;
     ctx.lineWidth = 1;
     list.forEach(function (d) { roundRect(X(d.x), Y(d.y), S(d.w), S(d.h), S(0.08)); ctx.fill(); ctx.stroke(); });
+    var n = list[named];  // name one desk; the others read the same
+    if (n) label('desk', n.x + n.w / 2, n.y + n.h / 2, 'center', P.deskText);
   }
   var DESKS_INDOOR = [
     { x: 2.1, y: 3.4, w: 1.5, h: 0.75 }, { x: 4.6, y: 3.4, w: 1.5, h: 0.75 },
@@ -247,7 +249,7 @@
 
   function drawIndoorBackdrop() {
     grid(0);
-    desks(DESKS_INDOOR);
+    desks(DESKS_INDOOR, 1);
     var D = M.DOOR;
     wallLine([[WALL, D.y0], [WALL, WALL], [W - WALL, WALL], [W - WALL, H - WALL], [WALL, H - WALL], [WALL, D.y1]], P.wall, 2);
     label('door', WALL + 0.12, (D.y0 + D.y1) / 2, 'left', P.dim);
@@ -275,7 +277,7 @@
     ctx.restore();
     // Inside
     grid(FX);
-    desks(DESKS_O2I);
+    desks(DESKS_O2I, 1);
     var D = O.DOOR;
     wallLine([[FX, WALL], [W - WALL, WALL], [W - WALL, D.y0]], P.wall, 2);
     wallLine([[W - WALL, D.y1], [W - WALL, H - WALL], [FX, H - WALL]], P.wall, 2);
@@ -524,6 +526,14 @@
       ctx.fillStyle = P.head; ctx.fill();
       ctx.restore();
     });
+    // Name one person (and keep the name on them until they walk out)
+    var crowd = world.people.length ? world.people : world.walkers;
+    if (crowd.indexOf(namedP) < 0) namedP = crowd.filter(function (p) { return p.state === undefined || p.state === 'in'; })[0] || null;
+    if (namedP) {
+      var py = namedP.y + 0.52;
+      if (py > H - WALL - 0.25) py = namedP.y - 0.52;
+      late.push(['person', namedP.x, py, 'center', P.text]);
+    }
 
     var met = e.rate >= TARGET;
     var pulse = (Math.sin(world.t * 3) + 1) / 2;
