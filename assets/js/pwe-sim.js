@@ -23,6 +23,51 @@
   var LINE = '#199e70', BELOW = '#d03b3b';
   var CONE = { sub6: 0.55, fr3: 0.24, mmw: 0.1 }; // beam half-width (rad), picture only
 
+  // Canvas colors. Light "floor plan" by default, dark when the device is in dark mode
+  // (the panel around the canvas follows the same switch in site.css).
+  var PALETTES = {
+    light: {
+      bg: '#f5f7fb', grid: 'rgba(15,23,42,.05)', deskFill: 'rgba(100,116,139,.10)', deskStroke: 'rgba(100,116,139,.32)',
+      wall: '#475569', text: '#475569', dim: '#64748b', status: '#5b6678',
+      street: '#d3dae5', sidewalk: '#fbfcfe', building: '#e2e8f0', lane: 'rgba(180,83,9,.55)', facade: '#475569',
+      glass: '#0284c7', glassText: '#0369a1', concreteText: '#475569',
+      treeFill: 'rgba(22,163,74,.14)', treeStroke: 'rgba(22,163,74,.6)', treeCore: 'rgba(22,163,74,.75)', treeMark: '#15803d',
+      cone: '217,119,6', coneA: 0.16, los: '#d97706', sev: ['#dc2626', '#c2410c', '#a16207'],
+      pkLos: '#78350f', pkRis: '#134e4a', pkMra: '#4c1d95', pkUp: '#f59e0b',
+      ris: '#0d9488', risRgb: '13,148,136', tileOff: 'rgba(71,85,105,.5)', tileBlocked: '#e2e8f0', tileCross: 'rgba(71,85,105,.5)',
+      risLabel: '#0f766e', offLabel: '#64748b',
+      mra: '#7c3aed', mraRgb: '124,58,237', mraOff: 'rgba(100,116,139,.4)', mraBlocked: '#cbd5e1', mraLabel: '#6d28d9',
+      car: '#64748b', bus: '#475569', carStroke: 'rgba(15,23,42,.35)', carGlass: 'rgba(255,255,255,.6)',
+      body: '#94a3b8', bodyStroke: 'rgba(15,23,42,.35)', head: '#334155',
+      userOk: '13,148,136', userBelow: '220,38,38', userDot: '#0f172a', userLabel: '#0f172a',
+      ap: '#d97706', apLabel: '#b45309', halo: 'rgba(245,247,251,.92)', glow: 0.35, boost: 1.35,
+      sBelow: 'rgba(208,59,59,.12)', sBase: 'rgba(15,23,42,.12)', sTarget: 'rgba(71,85,105,.65)',
+      sEvOn: '#475569', sEvOff: 'rgba(71,85,105,.3)', sText: '#5b6678', sHead: '#0f172a', sDot: '#ffffff',
+      sHover: 'rgba(15,23,42,.4)', sTipBg: 'rgba(15,23,42,.92)', sTipText: '#f8fafc'
+    },
+    dark: {
+      bg: '#16213a', grid: 'rgba(255,255,255,.045)', deskFill: 'rgba(148,163,184,.12)', deskStroke: 'rgba(148,163,184,.3)',
+      wall: 'rgba(203,213,225,.7)', text: 'rgba(214,222,235,.92)', dim: 'rgba(203,213,225,.72)', status: 'rgba(203,213,225,.85)',
+      street: '#0c1426', sidewalk: '#283860', building: '#1a243d', lane: 'rgba(251,191,36,.5)', facade: '#94a3b8',
+      glass: 'rgba(125,211,252,.8)', glassText: 'rgba(125,211,252,.92)', concreteText: 'rgba(203,213,225,.85)',
+      treeFill: 'rgba(34,197,94,.22)', treeStroke: 'rgba(74,222,128,.7)', treeCore: 'rgba(74,222,128,.85)', treeMark: '#4ade80',
+      cone: '251,191,36', coneA: 0.22, los: '#fbbf24', sev: ['#f87171', '#fb923c', '#fbbf24'],
+      pkLos: '#fef3c7', pkRis: '#ccfbf1', pkMra: '#ede9fe', pkUp: '#fbbf24',
+      ris: '#2dd4bf', risRgb: '45,212,191', tileOff: 'rgba(148,163,184,.5)', tileBlocked: '#26324d', tileCross: 'rgba(148,163,184,.5)',
+      risLabel: 'rgba(94,234,212,.95)', offLabel: 'rgba(203,213,225,.75)',
+      mra: '#a78bfa', mraRgb: '167,139,250', mraOff: 'rgba(148,163,184,.42)', mraBlocked: '#353d5a', mraLabel: 'rgba(196,181,253,.95)',
+      car: '#43516b', bus: '#4d5d7a', carStroke: 'rgba(226,232,240,.5)', carGlass: 'rgba(203,213,225,.6)',
+      body: '#56667f', bodyStroke: 'rgba(226,232,240,.5)', head: '#d3dbe6',
+      userOk: '45,212,191', userBelow: '248,113,113', userDot: '#ffffff', userLabel: '#f1f5f9',
+      ap: '#fbbf24', apLabel: '#fde68a', halo: 'rgba(22,33,58,.92)', glow: 1, boost: 1.15,
+      sBelow: 'rgba(208,59,59,.2)', sBase: 'rgba(255,255,255,.1)', sTarget: 'rgba(203,213,225,.6)',
+      sEvOn: 'rgba(214,222,235,.92)', sEvOff: 'rgba(203,213,225,.35)', sText: 'rgba(203,213,225,.88)', sHead: '#f8fafc', sDot: '#1a2338',
+      sHover: 'rgba(226,232,240,.55)', sTipBg: 'rgba(2,6,23,.95)', sTipText: '#f1f5f9'
+    }
+  };
+  var darkMq = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  var P = darkMq && darkMq.matches ? PALETTES.dark : PALETTES.light;
+
   // Representative scenarios (see README)
   var SCENES = {
     indoor: { make: M.createWorld, seed: 210 },
@@ -125,20 +170,20 @@
   function S(v) { return v * scale; }
   function label(text, x, y, align, color) {
     ctx.font = '600 ' + Math.max(10, Math.round(S(0.22))) + 'px "JetBrains Mono", ui-monospace, monospace';
-    ctx.fillStyle = color || 'rgba(148,163,184,.85)';
+    ctx.fillStyle = color || P.text;
     ctx.textAlign = align || 'left';
     ctx.textBaseline = 'middle';
     ctx.fillText(text, X(x), Y(y));
   }
   function line(points, color, width, alpha, dash) {
     ctx.save();
-    ctx.globalAlpha = alpha;
+    ctx.globalAlpha = Math.min(1, alpha * P.boost);
     ctx.strokeStyle = color;
     ctx.lineWidth = width * dpr;
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
     if (dash) ctx.setLineDash(dash.map(function (d) { return d * dpr; }));
-    else { ctx.shadowColor = color; ctx.shadowBlur = 10 * dpr; }
+    else { ctx.shadowColor = color; ctx.shadowBlur = 10 * dpr * P.glow; }
     ctx.beginPath();
     ctx.moveTo(X(points[0].x), Y(points[0].y));
     for (var i = 1; i < points.length; i++) ctx.lineTo(X(points[i].x), Y(points[i].y));
@@ -180,14 +225,14 @@
     ctx.stroke();
   }
   function grid(x0) {
-    ctx.strokeStyle = 'rgba(255,255,255,.035)';
+    ctx.strokeStyle = P.grid;
     ctx.lineWidth = 1;
     for (var gx = Math.ceil(x0); gx < W; gx++) { ctx.beginPath(); ctx.moveTo(X(gx), Y(WALL)); ctx.lineTo(X(gx), Y(H - WALL)); ctx.stroke(); }
     for (var gy = 1; gy < H; gy++) { ctx.beginPath(); ctx.moveTo(X(Math.max(WALL, x0)), Y(gy)); ctx.lineTo(X(W - WALL), Y(gy)); ctx.stroke(); }
   }
   function desks(list) {
-    ctx.fillStyle = 'rgba(148,163,184,.07)';
-    ctx.strokeStyle = 'rgba(148,163,184,.14)';
+    ctx.fillStyle = P.deskFill;
+    ctx.strokeStyle = P.deskStroke;
     ctx.lineWidth = 1;
     list.forEach(function (d) { roundRect(X(d.x), Y(d.y), S(d.w), S(d.h), S(0.08)); ctx.fill(); ctx.stroke(); });
   }
@@ -204,71 +249,78 @@
     grid(0);
     desks(DESKS_INDOOR);
     var D = M.DOOR;
-    wallLine([[WALL, D.y0], [WALL, WALL], [W - WALL, WALL], [W - WALL, H - WALL], [WALL, H - WALL], [WALL, D.y1]], 'rgba(148,163,184,.4)', 2);
-    label('door', WALL + 0.12, (D.y0 + D.y1) / 2, 'left', 'rgba(148,163,184,.5)');
+    wallLine([[WALL, D.y0], [WALL, WALL], [W - WALL, WALL], [W - WALL, H - WALL], [WALL, H - WALL], [WALL, D.y1]], P.wall, 2);
+    label('door', WALL + 0.12, (D.y0 + D.y1) / 2, 'left', P.dim);
   }
 
   function drawO2IBackdrop() {
     var O = M.O2I, FX = O.FX;
     // Street and sidewalk
-    ctx.fillStyle = '#080d1b';
+    ctx.fillStyle = P.street;
     ctx.fillRect(X(1.1), Y(0), S(1.3), S(H));
-    ctx.fillStyle = '#111a2f';
+    ctx.fillStyle = P.sidewalk;
     ctx.fillRect(X(2.4), Y(0), S(FX - 2.4), S(H));
     ctx.save();
     ctx.setLineDash([6 * dpr, 8 * dpr]);
-    wallLine([[O.LANE_X, 0], [O.LANE_X, H]], 'rgba(251,191,36,.35)', 1.2);
+    wallLine([[O.LANE_X, 0], [O.LANE_X, H]], P.lane, 1.2);
     ctx.restore();
-    label('street', 1.75, H - 0.3, 'center', 'rgba(148,163,184,.5)');
-    label('sidewalk', 2.9, 0.3, 'center', 'rgba(148,163,184,.5)');
+    label('street', 1.75, H - 0.3, 'center', P.dim);
+    // The sidewalk is narrower than its name: write it vertically
+    ctx.save();
+    ctx.translate(X(2.62), Y(H - 1.05));
+    ctx.rotate(-Math.PI / 2);
+    ctx.font = '600 ' + Math.max(10, Math.round(S(0.22))) + 'px "JetBrains Mono", ui-monospace, monospace';
+    ctx.fillStyle = P.dim; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('sidewalk', 0, 0);
+    ctx.restore();
     // Inside
     grid(FX);
     desks(DESKS_O2I);
     var D = O.DOOR;
-    wallLine([[FX, WALL], [W - WALL, WALL], [W - WALL, D.y0]], 'rgba(148,163,184,.4)', 2);
-    wallLine([[W - WALL, D.y1], [W - WALL, H - WALL], [FX, H - WALL]], 'rgba(148,163,184,.4)', 2);
-    label('door', W - WALL - 0.14, (D.y0 + D.y1) / 2, 'right', 'rgba(148,163,184,.5)');
+    wallLine([[FX, WALL], [W - WALL, WALL], [W - WALL, D.y0]], P.wall, 2);
+    wallLine([[W - WALL, D.y1], [W - WALL, H - WALL], [FX, H - WALL]], P.wall, 2);
+    label('door', W - WALL - 0.14, (D.y0 + D.y1) / 2, 'right', P.dim);
     // Facade: concrete piers and glass windows
     var spans = [], yPrev = WALL;
     O.WINDOWS.forEach(function (w) { spans.push([yPrev, w[0], 'c']); spans.push([w[0], w[1], 'g']); yPrev = w[1]; });
     spans.push([yPrev, H - WALL, 'c']);
     spans.forEach(function (s) {
-      if (s[2] === 'c') wallLine([[FX, s[0]], [FX, s[1]]], '#64748b', 6);
+      if (s[2] === 'c') wallLine([[FX, s[0]], [FX, s[1]]], P.facade, 6);
       else {
-        wallLine([[FX - 0.05, s[0]], [FX - 0.05, s[1]]], 'rgba(125,211,252,.55)', 1.4);
-        wallLine([[FX + 0.05, s[0]], [FX + 0.05, s[1]]], 'rgba(125,211,252,.55)', 1.4);
+        wallLine([[FX - 0.05, s[0]], [FX - 0.05, s[1]]], P.glass, 1.4);
+        wallLine([[FX + 0.05, s[0]], [FX + 0.05, s[1]]], P.glass, 1.4);
       }
     });
-    label('window', FX - 0.12, (O.WINDOWS[0][0] + O.WINDOWS[0][1]) / 2 - 0.9, 'right', 'rgba(125,211,252,.6)');
-    label('concrete', FX - 0.12, (O.WINDOWS[0][1] + O.WINDOWS[1][0]) / 2, 'right', 'rgba(148,163,184,.65)');
+    label('window', FX - 0.12, (O.WINDOWS[0][0] + O.WINDOWS[0][1]) / 2 - 0.9, 'right', P.glassText);
+    label('concrete', FX - 0.12, (O.WINDOWS[0][1] + O.WINDOWS[1][0]) / 2, 'right', P.concreteText);
   }
 
   function drawOutdoorBackdrop() {
     var O = M.OUT;
-    ctx.fillStyle = '#0d1426';
+    ctx.fillStyle = P.building;
     ctx.fillRect(X(0), Y(0), S(W), S(O.topFacade));
     ctx.fillRect(X(0), Y(O.bottomFacade), S(W), S(H - O.bottomFacade));
-    ctx.fillStyle = '#111a2f';
+    ctx.fillStyle = P.sidewalk;
     ctx.fillRect(X(0), Y(O.topFacade), S(W), S(O.street[0] - O.topFacade));
     ctx.fillRect(X(0), Y(O.street[1]), S(W), S(O.bottomFacade - O.street[1]));
-    ctx.fillStyle = '#080d1b';
+    ctx.fillStyle = P.street;
     ctx.fillRect(X(0), Y(O.street[0]), S(W), S(O.street[1] - O.street[0]));
     ctx.save();
     ctx.setLineDash([8 * dpr, 10 * dpr]);
     var mid = (O.street[0] + O.street[1]) / 2;
-    wallLine([[0, mid], [W, mid]], 'rgba(251,191,36,.35)', 1.2);
+    wallLine([[0, mid], [W, mid]], P.lane, 1.2);
     ctx.restore();
-    wallLine([[0, O.topFacade], [W, O.topFacade]], '#64748b', 3);
-    wallLine([[0, O.bottomFacade], [W, O.bottomFacade]], '#64748b', 3);
-    label('building', 0.25, O.topFacade / 2, 'left', 'rgba(148,163,184,.45)');
-    label('building', 0.25, (O.bottomFacade + H) / 2 + 0.2, 'left', 'rgba(148,163,184,.45)');
-    label('street', W - 0.25, O.street[0] + 0.3, 'right', 'rgba(148,163,184,.5)');
+    wallLine([[0, O.topFacade], [W, O.topFacade]], P.facade, 3);
+    wallLine([[0, O.bottomFacade], [W, O.bottomFacade]], P.facade, 3);
+    label('building', 0.25, O.topFacade / 2, 'left', P.dim);
+    label('building', 0.25, (O.bottomFacade + H) / 2 + 0.2, 'left', P.dim);
+    label('street', W - 0.25, O.street[0] + 0.3, 'right', P.dim);
     O.trees.forEach(function (t) {
       ctx.beginPath(); ctx.arc(X(t.x), Y(t.y), S(t.r), 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(34,197,94,.22)'; ctx.fill();
-      ctx.lineWidth = 1.5 * dpr; ctx.strokeStyle = 'rgba(74,222,128,.55)'; ctx.stroke();
+      ctx.fillStyle = P.treeFill; ctx.fill();
+      ctx.lineWidth = 1.5 * dpr; ctx.strokeStyle = P.treeStroke; ctx.stroke();
       ctx.beginPath(); ctx.arc(X(t.x), Y(t.y), S(0.07), 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(74,222,128,.7)'; ctx.fill();
+      ctx.fillStyle = P.treeCore; ctx.fill();
     });
   }
 
@@ -278,7 +330,7 @@
     var A = world.ap, u = world.user;
     var o2i = world.scene === 'o2i', out = world.scene === 'out';
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#0a1124';
+    ctx.fillStyle = P.bg;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     if (o2i) drawO2IBackdrop(); else if (out) drawOutdoorBackdrop(); else drawIndoorBackdrop();
 
@@ -286,8 +338,8 @@
     var ang = Math.atan2(u.y - A.y, u.x - A.x), half = CONE[sel.band];
     var reach = S(Math.hypot(u.x - A.x, u.y - A.y) + 0.6);
     var g = ctx.createRadialGradient(X(A.x), Y(A.y), 0, X(A.x), Y(A.y), reach);
-    g.addColorStop(0, 'rgba(251,191,36,.22)');
-    g.addColorStop(1, 'rgba(251,191,36,0)');
+    g.addColorStop(0, 'rgba(' + P.cone + ',' + P.coneA + ')');
+    g.addColorStop(1, 'rgba(' + P.cone + ',0)');
     ctx.fillStyle = g;
     ctx.beginPath();
     ctx.moveTo(X(A.x), Y(A.y));
@@ -325,10 +377,10 @@
     var losAlpha = clamp((e.losDb + 5) / 30, 0, 1);
     if (obst.length) {
       var p0 = { x: A.x + dx * obst[0].f, y: A.y + dy * obst[0].f };
-      line([A, p0], '#fbbf24', 1.6, 0.55);
-      if (losAlpha > 0.04) line([p0, u], '#fbbf24', 1.6, 0.55 * losAlpha);
+      line([A, p0], P.los, 1.6, 0.55);
+      if (losAlpha > 0.04) line([p0, u], P.los, 1.6, 0.55 * losAlpha);
     } else {
-      line([A, u], '#fbbf24', 1.6, 0.55);
+      line([A, u], P.los, 1.6, 0.55);
     }
     var nx = -dy / len, ny = dx / len;
     if (ny > 0) { nx = -nx; ny = -ny; }
@@ -344,7 +396,7 @@
         if (cnt.car) parts.push(cnt.car > 1 ? cnt.car + ' cars' : 'car');
         if (cnt.bus) parts.push(cnt.bus > 1 ? cnt.bus + ' buses' : 'bus');
         txt = parts.join(' + ') + ' −' + Math.round(e.blockDb) + ' dB';
-        col = band.block >= 20 ? '#f87171' : band.block >= 10 ? '#fb923c' : '#fbbf24';
+        col = band.block >= 20 ? P.sev[0] : band.block >= 10 ? P.sev[1] : P.sev[2];
         ctx.save();
         ctx.strokeStyle = col; ctx.lineWidth = 2 * dpr;
         var cx = X(hp.x), cy = Y(hp.y), r = 4 * dpr;
@@ -352,13 +404,13 @@
         ctx.restore();
       } else if (ob.kind === 'tree') {
         txt = 'tree −' + Math.round(e.foliageDb) + ' dB';
-        col = '#4ade80';
+        col = P.treeMark;
         ctx.beginPath(); ctx.arc(X(hp.x), Y(hp.y), 3.5 * dpr, 0, Math.PI * 2);
         ctx.fillStyle = col; ctx.fill();
       } else {
         var loss = ob.kind === 'glass' ? band.glass : band.concrete;
         txt = (ob.kind === 'glass' ? 'glass −' : 'wall −') + Math.round(loss) + ' dB';
-        col = ob.kind === 'glass' ? 'rgba(125,211,252,.9)' : (loss >= 40 ? '#f87171' : '#fb923c');
+        col = ob.kind === 'glass' ? P.glassText : (loss >= 40 ? P.sev[0] : P.sev[1]);
         ctx.beginPath(); ctx.arc(X(hp.x), Y(hp.y), 3.5 * dpr, 0, Math.PI * 2);
         ctx.fillStyle = col; ctx.fill();
       }
@@ -375,25 +427,25 @@
       late.push([txt, lx, ly, nx >= 0 ? 'left' : 'right', col]);
     });
 
-    var paths = [{ share: losShare, pts: [A, u], color: '#fde68a' }];
+    var paths = [{ share: losShare, pts: [A, u], color: P.pkLos }];
     if (sel.ris) {
       world.best.forEach(function (idx, rank) {
         var tl = world.tiles[idx];
         var pts = [A, { x: tl.ax, y: tl.ay }, u];
-        line(pts, '#2dd4bf', rank === 0 ? 2.2 : 1.2, (rank === 0 ? 0.25 : 0.12) + (rank === 0 ? 0.65 : 0.25) * Math.sqrt(risShare));
-        if (rank === 0) paths.push({ share: risShare, pts: pts, color: '#ccfbf1' });
+        line(pts, P.ris, rank === 0 ? 2.2 : 1.2, (rank === 0 ? 0.25 : 0.12) + (rank === 0 ? 0.65 : 0.25) * Math.sqrt(risShare));
+        if (rank === 0) paths.push({ share: risShare, pts: pts, color: P.pkRis });
       });
     }
     if (sel.mra && world.bestMra !== null) {
       var m = world.mra[world.bestMra];
       var mp = [A, { x: m.ax, y: m.ay }, u];
-      line(mp, '#a78bfa', 1.6, 0.2 + 0.6 * Math.sqrt(mraShare));
-      paths.push({ share: mraShare, pts: mp, color: '#ede9fe' });
+      line(mp, P.mra, 1.6, 0.2 + 0.6 * Math.sqrt(mraShare));
+      paths.push({ share: mraShare, pts: mp, color: P.pkMra });
     }
     paths.sort(function (a, c) { return c.share - a.share; });
     if (e.rate >= TARGET / 4 && paths[0].share > 0.05) {
       packets(paths[0].pts, paths[0].color);
-      if (o2i) packets(paths[0].pts, '#fbbf24', true, 0.125);
+      if (o2i) packets(paths[0].pts, P.pkUp, true, 0.125);
     }
 
     // RIS tiles: along the top wall indoors, on the windows outdoors-to-indoor
@@ -403,24 +455,24 @@
     world.tiles.forEach(function (tl, i) {
       var x = X(tl.x - tw / 2), y = Y(tl.y - th / 2), w = S(tw), h = S(th);
       if (!sel.ris) {
-        ctx.strokeStyle = 'rgba(148,163,184,.35)'; ctx.lineWidth = 1;
+        ctx.strokeStyle = P.tileOff; ctx.lineWidth = 1;
         ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
       } else if (tl.blocked) {
-        ctx.fillStyle = '#1b2438';
+        ctx.fillStyle = P.tileBlocked;
         ctx.fillRect(x, y, w, h);
-        ctx.strokeStyle = 'rgba(148,163,184,.35)'; ctx.lineWidth = 1;
+        ctx.strokeStyle = P.tileCross; ctx.lineWidth = 1;
         ctx.beginPath(); ctx.moveTo(x + 2, y + 2); ctx.lineTo(x + w - 2, y + h - 2); ctx.stroke();
       } else {
         ctx.save();
-        ctx.shadowColor = '#2dd4bf';
-        ctx.shadowBlur = 14 * dpr * tileGlow[i];
-        ctx.fillStyle = 'rgba(45,212,191,' + (0.25 + 0.75 * tileGlow[i]).toFixed(3) + ')';
+        ctx.shadowColor = P.ris;
+        ctx.shadowBlur = 14 * dpr * tileGlow[i] * P.glow;
+        ctx.fillStyle = 'rgba(' + P.risRgb + ',' + (0.25 + 0.75 * tileGlow[i]).toFixed(3) + ')';
         ctx.fillRect(x, y, w, h);
         ctx.restore();
       }
     });
     var risName = o2i ? 'RIS window' : 'RIS tiles';
-    var risCol = sel.ris ? 'rgba(94,234,212,.85)' : 'rgba(148,163,184,.7)';
+    var risCol = sel.ris ? P.risLabel : P.offLabel;
     if (out) risName = 'RIS façade';
     if (o2i) label(sel.ris ? risName : risName + ' · off', M.O2I.FX + 0.22, WALL + 0.45, 'left', risCol);
     else if (out) label(sel.ris ? risName : risName + ' · off', 2.3, M.OUT.topFacade - 0.42, 'left', risCol);
@@ -431,17 +483,17 @@
       ctx.save();
       ctx.translate(X(mm.x), Y(mm.y));
       ctx.rotate(mm.ang);
-      if (!sel.mra) ctx.fillStyle = 'rgba(148,163,184,.3)';
-      else if (mm.blocked) ctx.fillStyle = '#2a2f45';
+      if (!sel.mra) ctx.fillStyle = P.mraOff;
+      else if (mm.blocked) ctx.fillStyle = P.mraBlocked;
       else {
-        ctx.shadowColor = '#a78bfa';
-        ctx.shadowBlur = 12 * dpr * mraGlow[i];
-        ctx.fillStyle = 'rgba(167,139,250,' + (0.3 + 0.7 * mraGlow[i]).toFixed(3) + ')';
+        ctx.shadowColor = P.mra;
+        ctx.shadowBlur = 12 * dpr * mraGlow[i] * P.glow;
+        ctx.fillStyle = 'rgba(' + P.mraRgb + ',' + (0.3 + 0.7 * mraGlow[i]).toFixed(3) + ')';
       }
       ctx.fillRect(-S(0.05), -S(0.28), S(0.1), S(0.56));
       ctx.restore();
     });
-    var mraCol = sel.mra ? 'rgba(196,181,253,.85)' : 'rgba(148,163,184,.7)';
+    var mraCol = sel.mra ? P.mraLabel : P.offLabel;
     if (o2i) label(sel.mra ? 'MRA' : 'MRA · off', W - WALL - 0.3, WALL + 0.62, 'right', mraCol);
     else if (out) label(sel.mra ? 'MRA' : 'MRA · off', 3.0, M.OUT.bottomFacade + 0.72, 'center', mraCol);
     else label(sel.mra ? 'MRA' : 'MRA · off', W - WALL - 0.42, 1.45, 'right', mraCol);
@@ -449,10 +501,10 @@
     // Cars (outdoors)
     world.cars.forEach(function (c) {
       var cw = c.horiz ? c.len : c.wid, ch = c.horiz ? c.wid : c.len;
-      ctx.fillStyle = c.bus ? '#3b4a63' : '#334155';
+      ctx.fillStyle = c.bus ? P.bus : P.car;
       roundRect(X(c.x - cw / 2), Y(c.y - ch / 2), S(cw), S(ch), S(0.14)); ctx.fill();
-      ctx.lineWidth = 1.5 * dpr; ctx.strokeStyle = 'rgba(203,213,225,.4)'; ctx.stroke();
-      ctx.fillStyle = 'rgba(148,163,184,.5)';
+      ctx.lineWidth = 1.5 * dpr; ctx.strokeStyle = P.carStroke; ctx.stroke();
+      ctx.fillStyle = P.carGlass;
       var fwd = (c.horiz ? c.vx : c.vy) > 0 ? 1 : -1, ws = 0.22;
       if (c.horiz) ctx.fillRect(X(c.x + fwd * (c.len / 2 - 0.12) - (fwd > 0 ? ws : 0)), Y(c.y - c.wid * 0.32), S(ws), S(c.wid * 0.64));
       else ctx.fillRect(X(c.x - c.wid * 0.32), Y(c.y + fwd * (c.len / 2 - 0.12) - (fwd > 0 ? ws : 0)), S(c.wid * 0.64), S(ws));
@@ -466,32 +518,32 @@
       ctx.rotate(hd);
       ctx.beginPath();
       if (ctx.ellipse) ctx.ellipse(0, 0, S(0.15), S(0.3), 0, 0, Math.PI * 2); else ctx.arc(0, 0, S(0.24), 0, Math.PI * 2);
-      ctx.fillStyle = '#475569'; ctx.fill();
-      ctx.lineWidth = 1.5 * dpr; ctx.strokeStyle = 'rgba(203,213,225,.4)'; ctx.stroke();
+      ctx.fillStyle = P.body; ctx.fill();
+      ctx.lineWidth = 1.5 * dpr; ctx.strokeStyle = P.bodyStroke; ctx.stroke();
       ctx.beginPath(); ctx.arc(S(0.02), 0, S(0.125), 0, Math.PI * 2);
-      ctx.fillStyle = '#a5b1c2'; ctx.fill();
+      ctx.fillStyle = P.head; ctx.fill();
       ctx.restore();
     });
 
     var met = e.rate >= TARGET;
     var pulse = (Math.sin(world.t * 3) + 1) / 2;
     ctx.beginPath(); ctx.arc(X(u.x), Y(u.y), S(0.2 + 0.12 * pulse), 0, Math.PI * 2);
-    ctx.fillStyle = met ? 'rgba(45,212,191,' + (0.25 - 0.15 * pulse).toFixed(3) + ')' : 'rgba(248,113,113,' + (0.3 - 0.15 * pulse).toFixed(3) + ')';
+    ctx.fillStyle = met ? 'rgba(' + P.userOk + ',' + (0.25 - 0.15 * pulse).toFixed(3) + ')' : 'rgba(' + P.userBelow + ',' + (0.3 - 0.15 * pulse).toFixed(3) + ')';
     ctx.fill();
     ctx.beginPath(); ctx.arc(X(u.x), Y(u.y), S(0.14), 0, Math.PI * 2);
-    ctx.fillStyle = '#fff'; ctx.fill();
-    label('user', u.x, u.y + 0.46, 'center', '#e2e8f0');
+    ctx.fillStyle = P.userDot; ctx.fill();
+    label('user', u.x, u.y + 0.46, 'center', P.userLabel);
 
     ctx.save();
-    ctx.shadowColor = '#fbbf24'; ctx.shadowBlur = 12 * dpr;
-    ctx.fillStyle = '#fbbf24';
+    ctx.shadowColor = P.ap; ctx.shadowBlur = 12 * dpr * P.glow;
+    ctx.fillStyle = P.ap;
     roundRect(X(A.x - 0.17), Y(A.y - 0.17), S(0.34), S(0.34), S(0.07));
     ctx.fill();
     ctx.restore();
-    if (o2i || out) label(world.apLabel + ' · ' + band.carrier, A.x - 0.15, A.y + (out ? 0.55 : 0.45), 'left', '#fde68a');
-    else label(world.apLabel + ' · ' + band.carrier, A.x + 0.32, A.y + 0.3, 'left', '#fde68a');
+    if (o2i || out) label(world.apLabel + ' · ' + band.carrier, A.x - 0.15, A.y + (out ? 0.55 : 0.45), 'left', P.apLabel);
+    else label(world.apLabel + ' · ' + band.carrier, A.x + 0.32, A.y + 0.3, 'left', P.apLabel);
 
-    label(world.status(), W - WALL - 0.2, H - WALL - 0.28, 'right', 'rgba(148,163,184,.75)');
+    label(world.status(), W - WALL - 0.2, H - WALL - 0.28, 'right', P.status);
 
     // Stack labels that would overlap (boxes in world units)
     ctx.font = '600 ' + Math.max(10, Math.round(S(0.22))) + 'px "JetBrains Mono", ui-monospace, monospace';
@@ -512,7 +564,7 @@
       ctx.save();
       ctx.font = '600 ' + Math.max(10, Math.round(S(0.22))) + 'px "JetBrains Mono", ui-monospace, monospace';
       ctx.textAlign = l[3]; ctx.textBaseline = 'middle';
-      ctx.lineWidth = 4 * dpr; ctx.strokeStyle = 'rgba(10,17,36,.9)'; ctx.lineJoin = 'round';
+      ctx.lineWidth = 4 * dpr; ctx.strokeStyle = P.halo; ctx.lineJoin = 'round';
       ctx.strokeText(l[0], X(l[1]), Y(l[2]));
       ctx.restore();
       label(l[0], l[1], l[2], l[3], l[4]);
@@ -543,19 +595,19 @@
       if (below && start < 0) start = i;
       if (!below && start >= 0) {
         var x0 = g.x(start), x1 = Math.max(g.x(i - 1), x0 + 2 * dpr);
-        tctx.fillStyle = 'rgba(208,59,59,.16)';
+        tctx.fillStyle = P.sBelow;
         tctx.fillRect(x0, g.plotT, x1 - x0, g.plotB - g.plotT);
         tctx.fillStyle = BELOW;
         tctx.fillRect(x0, g.belowY, x1 - x0, g.belowH);
         start = -1;
       }
     }
-    tctx.fillStyle = 'rgba(255,255,255,.07)';
+    tctx.fillStyle = P.sBase;
     tctx.fillRect(g.padL, g.belowY + g.belowH, g.w - g.padL - g.padR, 1);
 
     tctx.save();
     tctx.setLineDash([4 * dpr, 4 * dpr]);
-    tctx.strokeStyle = 'rgba(203,213,225,.5)';
+    tctx.strokeStyle = P.sTarget;
     tctx.lineWidth = 1;
     tctx.beginPath(); tctx.moveTo(g.padL, g.y(TARGET)); tctx.lineTo(g.w - g.padR, g.y(TARGET)); tctx.stroke();
     tctx.restore();
@@ -577,7 +629,7 @@
 
     cur().events.forEach(function (ev) {
       var ex = g.x(ev.i), s = 4 * dpr, cy = g.evH / 2 + 1 * dpr;
-      tctx.fillStyle = ev.i < k ? 'rgba(203,213,225,.9)' : 'rgba(203,213,225,.35)';
+      tctx.fillStyle = ev.i < k ? P.sEvOn : P.sEvOff;
       tctx.beginPath();
       if (ev.kind === 'in') { tctx.moveTo(ex - s, cy + s); tctx.lineTo(ex + s, cy + s); tctx.lineTo(ex, cy - s); }
       else if (ev.kind === 'out') { tctx.moveTo(ex - s, cy - s); tctx.lineTo(ex + s, cy - s); tctx.lineTo(ex, cy + s); }
@@ -586,7 +638,7 @@
     });
 
     tctx.font = '500 ' + Math.round(10.5 * dpr) + 'px "JetBrains Mono", ui-monospace, monospace';
-    tctx.fillStyle = 'rgba(148,163,184,.9)';
+    tctx.fillStyle = P.sText;
     tctx.textBaseline = 'bottom';
     var plotCss = (g.w - g.padL - g.padR) / dpr;
     var tick = plotCss >= 560 ? 15 : plotCss >= 280 ? 30 : 60;
@@ -601,24 +653,24 @@
     tctx.fillText(YMAX + ' Gbps', g.w - g.padR, g.plotT);
 
     var px = g.x(k - 1);
-    tctx.fillStyle = '#f8fafc';
+    tctx.fillStyle = P.sHead;
     tctx.fillRect(px - 0.75 * dpr, g.plotT - 3 * dpr, 1.5 * dpr, g.belowY + g.belowH - g.plotT + 3 * dpr);
     tctx.beginPath(); tctx.arc(px, g.y(series[k - 1]), 4.5 * dpr, 0, Math.PI * 2);
     tctx.fillStyle = series[k - 1] >= TARGET ? LINE : BELOW; tctx.fill();
-    tctx.lineWidth = 2 * dpr; tctx.strokeStyle = '#0d1426'; tctx.stroke();
+    tctx.lineWidth = 2 * dpr; tctx.strokeStyle = P.sDot; tctx.stroke();
 
     if (hoverI !== null) {
       var hi = clamp(hoverI, 0, N - 1), hx = g.x(hi);
-      tctx.strokeStyle = 'rgba(226,232,240,.55)'; tctx.lineWidth = 1;
+      tctx.strokeStyle = P.sHover; tctx.lineWidth = 1;
       tctx.beginPath(); tctx.moveTo(hx, g.plotT); tctx.lineTo(hx, g.belowY + g.belowH); tctx.stroke();
       var v = series[hi];
       var txt = fmtTime((hi + 1) * DT) + ' · ' + v.toFixed(1) + ' Gbps · ' + (v >= TARGET ? 'meets' : 'below') + ' target · click to jump';
       tctx.font = '600 ' + Math.round(11 * dpr) + 'px Inter, system-ui, sans-serif';
       var tw = tctx.measureText(txt).width + 14 * dpr;
       var tx = clamp(hx - tw / 2, 0, g.w - tw);
-      tctx.fillStyle = 'rgba(15,23,42,.95)';
+      tctx.fillStyle = P.sTipBg;
       tctx.fillRect(tx, g.plotT, tw, 18 * dpr);
-      tctx.fillStyle = '#f1f5f9';
+      tctx.fillStyle = P.sTipText;
       tctx.textAlign = 'left'; tctx.textBaseline = 'middle';
       tctx.fillText(txt, tx + 7 * dpr, g.plotT + 9 * dpr);
     }
@@ -854,5 +906,9 @@
     new IntersectionObserver(function (entries) { onScreen = entries[0].isIntersecting; if (onScreen) kick(); }).observe(canvas);
   }
   document.addEventListener('visibilitychange', function () { if (!document.hidden) kick(); });
+  if (darkMq) {
+    var onScheme = function () { P = darkMq.matches ? PALETTES.dark : PALETTES.light; render(); };
+    if (darkMq.addEventListener) darkMq.addEventListener('change', onScheme); else if (darkMq.addListener) darkMq.addListener(onScheme);
+  }
   kick();
 })();
