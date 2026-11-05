@@ -4,7 +4,7 @@
 
 - id: fr3-measurements
   name: FR3 Hybrid PWE Measurement Dataset
-  thrust: T1.1
+  thrust: T1
   status: planned
   summary: Measured FR3 channels in programmable wireless environments that combine reconfigurable intelligent surfaces (RIS) and metallic reflector arrays (MRA).
   contents:
@@ -18,9 +18,9 @@
 
 - id: dynamic-simulation
   name: Dynamic FR3 PWE Simulation Dataset
-  thrust: T1.2
+  thrust: T1
   status: planned
-  summary: Synthetic channel data from a CST Studio–NVIDIA Sionna simulation suite calibrated against measurements, covering the dynamics real rooms actually have.
+  summary: Synthetic channel data from a simulation platform calibrated against measurements, covering the dynamics real rooms actually have.
   contents:
     - Multi-user mobility, including users entering, wandering, and leaving a room
     - Time-varying occupancy levels
@@ -37,7 +37,7 @@
   summary: Channel data paired with environment context, for training and benchmarking ISAC models that infer occupancy, mobility stage, and layout changes from the channel itself.
   contents:
     - Channel-gain sequences labeled with occupancy level and mobility stage
-    - Layout-change events, for studying concept drift and continual learning
+    - Layout-change events, for studying how models cope with rearranged rooms
     - Train and test splits for evaluating generalization to unseen scenarios
   link: ""
   doi: ""
