@@ -238,18 +238,17 @@
     var n = list[named];  // name one desk; the others read the same
     if (n) label('desk', n.x + n.w / 2, n.y + n.h / 2, 'center', P.deskText);
   }
+  // Desks stand against the walls, where nobody walks during the 2-minute
+  // scenario, so the user and the people never pass through them. The
+  // outdoor-to-indoor room has no such free spot, so it has no desks.
   var DESKS_INDOOR = [
-    { x: 2.1, y: 3.4, w: 1.5, h: 0.75 }, { x: 4.6, y: 3.4, w: 1.5, h: 0.75 },
-    { x: 7.1, y: 3.4, w: 1.5, h: 0.75 }, { x: 4.6, y: 5.5, w: 1.5, h: 0.75 }
-  ];
-  var DESKS_O2I = [
-    { x: 4.6, y: 2.3, w: 1.3, h: 0.7 }, { x: 7.3, y: 2.3, w: 1.3, h: 0.7 },
-    { x: 4.6, y: 4.6, w: 1.3, h: 0.7 }, { x: 7.3, y: 4.6, w: 1.3, h: 0.7 }
+    { x: 4.4, y: 0.7, w: 1.5, h: 0.7 }, { x: 6.35, y: 0.7, w: 1.2, h: 0.6 },
+    { x: 0.35, y: 3.9, w: 0.7, h: 1.5 }, { x: 8.5, y: 3.9, w: 0.6, h: 1.2 }
   ];
 
   function drawIndoorBackdrop() {
     grid(0);
-    desks(DESKS_INDOOR, 1);
+    desks(DESKS_INDOOR, 0);
     var D = M.DOOR;
     wallLine([[WALL, D.y0], [WALL, WALL], [W - WALL, WALL], [W - WALL, H - WALL], [WALL, H - WALL], [WALL, D.y1]], P.wall, 2);
     label('door', WALL + 0.12, (D.y0 + D.y1) / 2, 'left', P.dim);
@@ -277,7 +276,6 @@
     ctx.restore();
     // Inside
     grid(FX);
-    desks(DESKS_O2I, 1);
     var D = O.DOOR;
     wallLine([[FX, WALL], [W - WALL, WALL], [W - WALL, D.y0]], P.wall, 2);
     wallLine([[W - WALL, D.y1], [W - WALL, H - WALL], [FX, H - WALL]], P.wall, 2);
@@ -528,7 +526,12 @@
     });
     // Name one person (and keep the name on them until they walk out)
     var crowd = world.people.length ? world.people : world.walkers;
-    if (crowd.indexOf(namedP) < 0) namedP = crowd.filter(function (p) { return p.state === undefined || p.state === 'in'; })[0] || null;
+    if (crowd.indexOf(namedP) < 0) {
+      var cand = crowd.filter(function (p) { return p.state === undefined || p.state === 'in'; });
+      // On the street, name someone on the top sidewalk: the bottom one already has the BS, trees and MRA
+      if (!world.people.length) cand.sort(function (a, c) { return a.y - c.y; });
+      namedP = cand[0] || null;
+    }
     if (namedP) {
       var py = namedP.y + 0.52;
       if (py > H - WALL - 0.25) py = namedP.y - 0.52;
