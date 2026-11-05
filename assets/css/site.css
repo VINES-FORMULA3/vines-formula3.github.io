@@ -606,13 +606,11 @@ p { margin: 0 0 1em; }
 
 /* Thrust diagram */
 .diagram { display: grid; grid-template-columns: minmax(0, 1fr) 56px minmax(0, 1fr); grid-template-areas: "t1 t1 t1" "f1 f1 f1" "t2 ai t3" "f2 f2 f2" "t4 t4 t4"; gap: 0; }
-.dg-box { --c: var(--t1); --c-soft: var(--t1-soft); border: 2px solid var(--c); background: var(--c-soft); border-radius: var(--radius); padding: 16px; }
+.dg-box { --c: var(--t1); --c-soft: var(--t1-soft); border: 2px solid var(--c); background: var(--c-soft); border-radius: var(--radius); padding: 16px; scroll-margin-top: 130px; }
 .dg-box h3 { font-size: 1rem; margin: 0 0 12px; color: var(--text); }
 .dg-box h3 span { font-family: var(--font-mono); color: var(--c); margin-right: 6px; }
-.dg-tasks { display: grid; gap: 8px; }
-.dg-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-.dg-task { background: var(--surface); border: 1px solid color-mix(in srgb, var(--c) 45%, transparent); border-radius: 8px; padding: 9px 11px; font-size: .88rem; line-height: 1.35; color: var(--text-2); }
-.dg-task b { font: 600 .74rem/1 var(--font-mono); color: var(--c); display: block; margin-bottom: 4px; }
+.dg-box p { margin: 0; font-size: .94rem; line-height: 1.5; color: var(--text-2); }
+.thrust-note { margin-top: 18px; font-size: .9rem; }
 .dg-t1 { grid-area: t1; } .dg-t2 { grid-area: t2; --c: var(--t2); --c-soft: var(--t2-soft); } .dg-t3 { grid-area: t3; --c: var(--t3); --c-soft: var(--t3-soft); } .dg-t4 { grid-area: t4; --c: var(--t4); --c-soft: var(--t4-soft); }
 .dg-flow { display: flex; justify-content: center; gap: 18%; align-items: center; height: 44px; font: 500 .72rem/1 var(--font-mono); color: var(--muted); letter-spacing: .04em; }
 .dg-flow span { display: inline-flex; flex-direction: column; align-items: center; gap: 4px; }
@@ -624,24 +622,7 @@ p { margin: 0 0 1em; }
   .diagram { grid-template-columns: 1fr; grid-template-areas: "t1" "f1" "t2" "ai" "t3" "f2" "t4"; }
   .dg-ai { height: 40px; flex-direction: row; gap: 8px; }
   .dg-ai::after { content: "↓"; }
-  .dg-row { grid-template-columns: 1fr; }
 }
-
-/* Thrust detail blocks */
-.thrust-detail { --c: var(--t1); --c-soft: var(--t1-soft); margin-top: clamp(36px, 5vw, 56px); padding-top: clamp(28px, 4vw, 40px); border-top: 1px solid var(--line); scroll-margin-top: 130px; }
-.thrust-detail.t2 { --c: var(--t2); --c-soft: var(--t2-soft); }
-.thrust-detail.t3 { --c: var(--t3); --c-soft: var(--t3-soft); }
-.thrust-detail.t4 { --c: var(--t4); --c-soft: var(--t4-soft); }
-.thrust-detail header { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 18px; }
-.thrust-detail .badge { flex: none; width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; background: var(--c); color: #fff; font: 700 1.05rem/1 var(--font-mono); }
-.thrust-detail h2 { font-size: clamp(1.4rem, 2.4vw, 1.8rem); margin: 4px 0 .3em; }
-.thrust-detail header p { margin: 0; color: var(--text-2); max-width: 760px; }
-.task-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
-.task { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 20px; }
-.task .tid { font: 600 .76rem/1 var(--font-mono); color: var(--c); display: inline-block; background: var(--c-soft); border-radius: 6px; padding: 5px 7px; margin-bottom: 10px; }
-.task h3 { font-size: 1.05rem; margin-bottom: .45em; }
-.task p { font-size: .94rem; color: var(--text-2); margin: 0; }
-.task .lead { margin-top: 12px; font-size: .82rem; color: var(--muted); }
 
 /* Research vectors */
 .vectors { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }

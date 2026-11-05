@@ -3,7 +3,7 @@
   <table class="gantt">
     <thead>
       <tr class="yr">
-        <th scope="col" rowspan="2">Task</th>
+        <th scope="col" rowspan="2">Thrust</th>
         <th scope="colgroup" colspan="2">Year 1</th>
         <th scope="colgroup" colspan="2">Year 2</th>
         <th scope="colgroup" colspan="2">Year 3</th>
@@ -16,7 +16,7 @@
       {% for task in tl.tasks %}
       {% assign s = task.span[0] %}{% assign e = task.span[1] %}
       <tr class="t{{ task.thrust }}">
-        <th scope="row" class="task-cell"><b>{{ task.id }}</b>{{ task.name }}<small>{{ task.lead }} · {{ task.deliverable }}</small></th>
+        <th scope="row" class="task-cell"><b>{{ task.id }}</b>{{ task.name }}{% if task.lead or task.deliverable %}<small>{{ task.lead }}{% if task.lead and task.deliverable %} · {% endif %}{{ task.deliverable }}</small>{% endif %}</th>
         {% for i in (1..6) %}
         {% if i >= s and i <= e %}
         <td class="p on{% if i == s %} start{% endif %}{% if i == e %} end{% endif %}" title="{{ tl.periods[forloop.index0].dates }}"><div class="bar"></div><span class="sr-only">active</span></td>
