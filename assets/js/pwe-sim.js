@@ -36,7 +36,7 @@
       pkLos: '#78350f', pkRis: '#134e4a', pkMra: '#4c1d95', pkUp: '#f59e0b',
       ris: '#0d9488', risRgb: '13,148,136', tileOff: 'rgba(71,85,105,.5)', tileBlocked: '#e2e8f0', tileCross: 'rgba(71,85,105,.5)',
       risLabel: '#0f766e', offLabel: '#64748b',
-      mra: '#7c3aed', mraRgb: '124,58,237', mraOff: 'rgba(100,116,139,.4)', mraBlocked: '#cbd5e1', mraLabel: '#6d28d9',
+      mra: '#7c3aed', mraRgb: '124,58,237', mraOff: 'rgba(100,116,139,.4)', mraBlocked: '#cbd5e1', mraLabel: '#6d28d9', mraRail: 'rgba(71,85,105,.6)',
       car: '#64748b', bus: '#475569', carStroke: 'rgba(15,23,42,.35)', carGlass: 'rgba(255,255,255,.6)',
       body: '#94a3b8', bodyStroke: 'rgba(15,23,42,.35)', head: '#334155',
       userOk: '13,148,136', userBelow: '220,38,38', userDot: '#0f172a', userLabel: '#0f172a',
@@ -55,7 +55,7 @@
       pkLos: '#fef3c7', pkRis: '#ccfbf1', pkMra: '#ede9fe', pkUp: '#fbbf24',
       ris: '#2dd4bf', risRgb: '45,212,191', tileOff: 'rgba(148,163,184,.5)', tileBlocked: '#26324d', tileCross: 'rgba(148,163,184,.5)',
       risLabel: 'rgba(94,234,212,.95)', offLabel: 'rgba(203,213,225,.75)',
-      mra: '#a78bfa', mraRgb: '167,139,250', mraOff: 'rgba(148,163,184,.42)', mraBlocked: '#353d5a', mraLabel: 'rgba(196,181,253,.95)',
+      mra: '#a78bfa', mraRgb: '167,139,250', mraOff: 'rgba(148,163,184,.42)', mraBlocked: '#353d5a', mraLabel: 'rgba(196,181,253,.95)', mraRail: 'rgba(203,213,225,.5)',
       car: '#43516b', bus: '#4d5d7a', carStroke: 'rgba(226,232,240,.5)', carGlass: 'rgba(203,213,225,.6)',
       body: '#56667f', bodyStroke: 'rgba(226,232,240,.5)', head: '#d3dbe6',
       userOk: '45,212,191', userBelow: '248,113,113', userDot: '#ffffff', userLabel: '#f1f5f9',
@@ -139,9 +139,13 @@
       var target = !sel.ris || tl.blocked ? 0 : world.best.indexOf(i) >= 0 ? 1 : 0.38;
       tileGlow[i] = tileGlow[i] === undefined ? target : tileGlow[i] + (target - tileGlow[i]) * ease;
     });
-    world.mra.forEach(function (m, i) {
-      var target = !sel.mra || m.blocked ? 0 : i === world.bestMra ? 1 : 0.38;
-      mraGlow[i] = mraGlow[i] === undefined ? target : mraGlow[i] + (target - mraGlow[i]) * ease;
+    var g = 0;
+    world.mra.forEach(function (pn) {
+      pn.tiles.forEach(function (t) {
+        var target = !sel.mra || t.blocked || !t.reach ? 0 : 1;
+        mraGlow[g] = mraGlow[g] === undefined ? target : mraGlow[g] + (target - mraGlow[g]) * ease;
+        g++;
+      });
     });
   }
   function rateNow() { return cur().series[selKey()][k - 1]; }
@@ -436,11 +440,25 @@
         if (rank === 0) paths.push({ share: risShare, pts: pts, color: P.pkRis });
       });
     }
-    if (sel.mra && world.bestMra !== null) {
-      var m = world.mra[world.bestMra];
-      var mp = [A, { x: m.ax, y: m.ay }, u];
-      line(mp, P.mra, 1.6, 0.2 + 0.6 * Math.sqrt(mraShare));
-      paths.push({ share: mraShare, pts: mp, color: P.pkMra });
+    if (sel.mra && e.mraParts) {
+      // Each panel focuses: the rays from all of its working tiles meet at the user
+      var bestPn = null, bestShare = 0;
+      world.mra.forEach(function (pn, j) {
+        var db = e.mraParts[j];
+        if (db === null) return;
+        var share = db2lin(db) / total;
+        var on = pn.tiles.filter(function (t) { return t.reach && !t.blocked; });
+        var a0 = on[0], a1 = on[on.length - 1];
+        ctx.save();
+        ctx.fillStyle = 'rgba(' + P.mraRgb + ',' + (0.05 * P.boost).toFixed(3) + ')';
+        ctx.beginPath(); ctx.moveTo(X(A.x), Y(A.y)); ctx.lineTo(X(a0.x), Y(a0.y)); ctx.lineTo(X(a1.x), Y(a1.y)); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = 'rgba(' + P.mraRgb + ',' + ((0.07 + 0.13 * Math.sqrt(share)) * P.boost).toFixed(3) + ')';
+        ctx.beginPath(); ctx.moveTo(X(a0.x), Y(a0.y)); ctx.lineTo(X(a1.x), Y(a1.y)); ctx.lineTo(X(u.x), Y(u.y)); ctx.closePath(); ctx.fill();
+        ctx.restore();
+        on.forEach(function (t) { line([t, u], P.mra, 1, 0.18 + 0.42 * Math.sqrt(share)); });
+        if (share > bestShare) { bestShare = share; bestPn = pn; }
+      });
+      if (bestPn) paths.push({ share: mraShare, pts: [A, { x: bestPn.cx, y: bestPn.cy }, u], color: P.pkMra });
     }
     paths.sort(function (a, c) { return c.share - a.share; });
     if (e.rate >= TARGET / 4 && paths[0].share > 0.05) {
@@ -478,25 +496,35 @@
     else if (out) label(sel.ris ? risName : risName + ' · off', 2.3, M.OUT.topFacade - 0.42, 'left', risCol);
     else label(sel.ris ? risName : risName + ' · off', 1.08, WALL + 0.52, 'left', risCol);
 
-    // MRA slats
-    world.mra.forEach(function (mm, i) {
-      ctx.save();
-      ctx.translate(X(mm.x), Y(mm.y));
-      ctx.rotate(mm.ang);
-      if (!sel.mra) ctx.fillStyle = P.mraOff;
-      else if (mm.blocked) ctx.fillStyle = P.mraBlocked;
-      else {
-        ctx.shadowColor = P.mra;
-        ctx.shadowBlur = 12 * dpr * mraGlow[i] * P.glow;
-        ctx.fillStyle = 'rgba(' + P.mraRgb + ',' + (0.3 + 0.7 * mraGlow[i]).toFixed(3) + ')';
-      }
-      ctx.fillRect(-S(0.05), -S(0.28), S(0.1), S(0.56));
-      ctx.restore();
+    // MRA panels: a rail on the wall carrying hexagonal metal tiles. From above,
+    // each tile column is a short mirror, turned so its reflection reaches the user.
+    var gi = 0;
+    world.mra.forEach(function (pn) {
+      var half = Math.hypot(pn.x1 - pn.x0, pn.y1 - pn.y0) / pn.tiles.length * 0.4;
+      wallLine([[pn.x0, pn.y0], [pn.x1, pn.y1]], sel.mra ? P.mraRail : P.mraOff, 2);
+      pn.tiles.forEach(function (t) {
+        var a = sel.mra ? t.ang : 0, c = Math.cos(a), sn = Math.sin(a);
+        var tnx = pn.nx * c - pn.ny * sn, tny = pn.nx * sn + pn.ny * c;   // the tile's normal
+        var hx = -tny * half, hy = tnx * half;
+        ctx.save();
+        ctx.lineCap = 'round';
+        ctx.lineWidth = S(0.07);
+        if (!sel.mra) ctx.strokeStyle = P.mraOff;
+        else if (t.blocked || !t.reach) ctx.strokeStyle = P.mraBlocked;
+        else {
+          ctx.shadowColor = P.mra;
+          ctx.shadowBlur = 10 * dpr * mraGlow[gi] * P.glow;
+          ctx.strokeStyle = 'rgba(' + P.mraRgb + ',' + (0.35 + 0.65 * mraGlow[gi]).toFixed(3) + ')';
+        }
+        ctx.beginPath(); ctx.moveTo(X(t.x - hx), Y(t.y - hy)); ctx.lineTo(X(t.x + hx), Y(t.y + hy)); ctx.stroke();
+        ctx.restore();
+        gi++;
+      });
     });
     var mraCol = sel.mra ? P.mraLabel : P.offLabel;
-    if (o2i) label(sel.mra ? 'MRA' : 'MRA · off', W - WALL - 0.3, WALL + 0.62, 'right', mraCol);
-    else if (out) label(sel.mra ? 'MRA' : 'MRA · off', 3.0, M.OUT.bottomFacade + 0.72, 'center', mraCol);
-    else label(sel.mra ? 'MRA' : 'MRA · off', W - WALL - 0.42, 1.45, 'right', mraCol);
+    if (o2i) label(sel.mra ? 'MRA' : 'MRA · off', 6.85, WALL + 0.42, 'left', mraCol);
+    else if (out) label(sel.mra ? 'MRA' : 'MRA · off', 1.35, M.OUT.topFacade - 0.4, 'center', mraCol);
+    else label(sel.mra ? 'MRA' : 'MRA · off', W - WALL - 0.3, 2.45, 'right', mraCol);
 
     // Cars (outdoors)
     world.cars.forEach(function (c) {
