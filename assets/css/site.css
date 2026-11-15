@@ -234,6 +234,7 @@ p { margin: 0 0 1em; }
   --lab-below-bg: #fee2e2; --lab-below-text: #991b1b;
   --lab-target: rgba(71, 85, 105, .75);
   --lab-btn-bg: #ffffff; --lab-btn-border: #cbd5e1; --lab-btn-text: #0f172a; --lab-btn-hover: #f1f5f9;
+  --lab-mra: #7c3aed;
   margin: 0; padding: clamp(14px, 1.6vw, 18px); border-radius: 20px;
   background: var(--lab-bg);
   border: 1px solid var(--lab-border);
@@ -248,7 +249,7 @@ p { margin: 0 0 1em; }
     --lab-box: rgba(255, 255, 255, .045); --lab-box-border: rgba(255, 255, 255, .1);
     --lab-seg-bg: rgba(255, 255, 255, .05); --lab-seg-border: rgba(255, 255, 255, .14);
     --lab-seg-text: #cbd5e1; --lab-seg-hover: #ffffff; --lab-seg-on-bg: #e2e8f0; --lab-seg-on-text: #0b1020;
-    --lab-focus: #5eead4;
+    --lab-focus: #5eead4; --lab-mra: #a78bfa;
     --lab-canvas: #16213a; --lab-canvas-border: rgba(255, 255, 255, .1);
     --lab-cell-hover: rgba(255, 255, 255, .05); --lab-cell-on: rgba(255, 255, 255, .1); --lab-cell-on-ring: rgba(255, 255, 255, .25);
     --lab-ok-bg: rgba(12, 163, 12, .18); --lab-ok-text: #86efac;
@@ -287,6 +288,7 @@ p { margin: 0 0 1em; }
 .sim-controls .seg:first-child { grid-column: 1 / -1; }
 .seg { border: 0; margin: 0; padding: 0; min-width: 0; }
 .seg legend { padding: 0; margin-bottom: 5px; font: 500 .68rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--lab-muted); }
+.hex-glyph { vertical-align: -3px; margin-left: 3px; fill: var(--lab-mra); }
 .seg-opts { display: inline-flex; background: var(--lab-seg-bg); border: 1px solid var(--lab-seg-border); border-radius: 999px; padding: 3px; }
 .seg-opts label { position: relative; cursor: pointer; }
 .seg-opts input { position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; }

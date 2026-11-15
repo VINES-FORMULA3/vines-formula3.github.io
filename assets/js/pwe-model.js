@@ -3,20 +3,25 @@
 // Two scenes share one world size (10 x 7.4 m, top view):
 //
 // - indoor: a room with an access point (AP), RIS tiles on the top wall, a
-//   metallic reflector array (MRA) on the right wall, a moving user, and people
+//   metallic reflector arrays (MRA) on the right wall, a moving user, and people
 //   who walk in and out.
 // - o2i (outdoor-to-indoor): a base station (BS) across a street with pedestrians
 //   and passing cars; a building facade with two windows and concrete piers;
-//   a transmissive RIS on the windows ("smart window"); an MRA on an inside wall;
+//   a transmissive RIS on the windows ("smart window"); MRAs on two inside walls;
 //   and a user inside with people coming and going.
 // - outdoor: a street with buildings on both sides, a base station on a lamp
-//   post, cars and buses in both lanes, pedestrians, and trees; a RIS on the
-//   facade across the street and an MRA on the near facade. FORMULA3 focuses on
+//   post, cars and buses in both lanes, pedestrians, and trees; a RIS and an MRA
+//   on the facade across the street. FORMULA3 focuses on
 //   indoor and O2I; this scene is for comparison.
 //
 // For each band the link combines a direct path (attenuated by people, cars, and
 // the facade), a weak diffuse floor, and, when switched on, the best unshadowed
-// RIS tiles and MRA slat. Shadowed elements are excluded.
+// RIS tiles and the MRA panels. Shadowed elements are excluded.
+//
+// An MRA panel is a grid of hexagonal metal tiles, each tilted by its own motor.
+// Seen from above, each column of tiles is a small mirror. Every tile turns so
+// its reflection lands on the user, so the panel acts like one large focusing
+// dish (the idea behind a segmented telescope mirror).
 //
 // The numbers are rough, textbook-style trends chosen to show the trade-offs
 // (sub-7: robust but narrow; mmWave: wide but fragile; FR3 in between). Facade
@@ -81,6 +86,57 @@
     return band.bw * Math.min(SE_MAX, ETA * Math.log2(1 + lin));
   }
 
+  // ---------------------------------------------------------------- MRA panels
+  var TILE_TURN = 35 * Math.PI / 180;   // how far a tile can turn from facing straight out
+  var MRA_TILES = 7;                    // tile columns per panel, as seen from above
+  var MRA_OFF = 0.08;                   // tiles stand slightly off the wall
+  // A panel along the wall from (x0, y0) to (x1, y1); (nx, ny) points into the room
+  function mraPanel(x0, y0, x1, y1, nx, ny) {
+    var tiles = [];
+    for (var i = 0; i < MRA_TILES; i++) {
+      var f = (i + 0.5) / MRA_TILES;
+      tiles.push({ x: x0 + (x1 - x0) * f + nx * MRA_OFF, y: y0 + (y1 - y0) * f + ny * MRA_OFF,
+        ang: 0, reach: true, blocked: false, cross: null });
+    }
+    return { x0: x0, y0: y0, x1: x1, y1: y1, nx: nx, ny: ny,
+      cx: (x0 + x1) / 2 + nx * MRA_OFF, cy: (y0 + y1) / 2 + ny * MRA_OFF, tiles: tiles, d: 0, live: 0 };
+  }
+  // Turn every tile toward the user. Law of reflection: the tile faces halfway
+  // between the source and the user. A tile helps only if it can turn that far
+  // and both of its legs (source to tile, tile to user) are clear.
+  function steerPanel(pn, src, u, blocked, cross) {
+    var c = { x: pn.cx, y: pn.cy };
+    pn.d = hyp(src, c) + hyp(c, u);
+    pn.live = 0;
+    pn.tiles.forEach(function (t) {
+      var ax = src.x - t.x, ay = src.y - t.y, la = Math.hypot(ax, ay);
+      var bx = u.x - t.x, by = u.y - t.y, lb = Math.hypot(bx, by);
+      var mx = ax / la + bx / lb, my = ay / la + by / lb;
+      var ideal = Math.atan2(pn.nx * my - pn.ny * mx, pn.nx * mx + pn.ny * my);
+      t.reach = Math.abs(ideal) <= TILE_TURN;
+      t.ang = Math.max(-TILE_TURN, Math.min(TILE_TURN, ideal));
+      t.blocked = blocked(src, t) || blocked(t, u);
+      t.cross = cross ? cross(src, t) : null;
+      if (t.reach && !t.blocked) pn.live++;
+    });
+  }
+  // The working tiles add up in phase at the user, so a panel's gain scales
+  // with the square of the share of tiles that work. Panels add up in power.
+  function mraLink(panels, band, loss) {
+    var lin = 0;
+    var parts = panels.map(function (pn) {
+      var amp = 0;
+      pn.tiles.forEach(function (t) {
+        if (t.reach && !t.blocked) amp += loss ? Math.pow(10, -loss(t, band) / 20) : 1;
+      });
+      if (amp <= 0) return null;
+      var db = band.s1m - 20 * Math.log10(pn.d) + band.mra + 20 * Math.log10(amp / pn.tiles.length);
+      lin += db2lin(db);
+      return db;
+    });
+    return { db: lin > 0 ? lin2db(lin) : null, lin: lin, parts: parts };
+  }
+
   // ---------------------------------------------------------------- indoor
   function createWorld(seed) {
     var rand = mulberry32(seed || 20261001);
@@ -91,11 +147,8 @@
       var tx = 1.25 + i * (7.5 / (NT - 1));
       tiles.push({ x: tx, y: WALL + 0.1, ax: tx, ay: WALL + 0.22, blocked: false });
     }
-    var mra = [];
-    for (var j = 0; j < 5; j++) {
-      var my = 2.0 + j * 0.78;
-      mra.push({ x: W - WALL - 0.1, y: my, ax: W - WALL - 0.2, ay: my, ang: -0.5, blocked: false });
-    }
+    // Two MRA panels on the right wall
+    var mra = [mraPanel(W - WALL, 2.7, W - WALL, 4.2, -1, 0), mraPanel(W - WALL, 5.2, W - WALL, 6.7, -1, 0)];
 
     function newTarget(p) { p.tx = r(1.2, 8.8); p.ty = r(1.3, 6.5); }
     function makePerson(x, y, entering) {
@@ -111,7 +164,7 @@
       scene: 'indoor', ap: AP, apLabel: 'AP',
       t: 0, tiles: tiles, mra: mra, people: people, NT: NT, cars: [], walkers: [],
       tileOrient: 'h',
-      user: userPos(0), pred: userPos(LOOKAHEAD), best: [], bestMra: null, losBlocker: null, active: 0
+      user: userPos(0), pred: userPos(LOOKAHEAD), best: [], losBlocker: null, active: 0
     };
 
     function userPos(t) {
@@ -177,13 +230,7 @@
       cand.sort(function (a, b) { return a.d - b.d; });
       world.best = cand.slice(0, 3).map(function (c) { return c.i; });
 
-      world.bestMra = null;
-      var bestD = Infinity;
-      mra.forEach(function (m, idx) {
-        m.blocked = blockers(AP, m).n > 0 || blockers(m, u).n > 0;
-        m.d = hyp(AP, m) + hyp(m, u);
-        if (!m.blocked && m.d < bestD) { bestD = m.d; world.bestMra = idx; }
-      });
+      mra.forEach(function (pn) { steerPanel(pn, AP, u, function (a, b) { return blockers(a, b).n > 0; }); });
       var los = blockers(AP, u);
       world.losCount = los.n;
       world.losBlocker = los.first;
@@ -208,13 +255,12 @@
           lin += db2lin(risDb);
         }
       }
+      var mraParts = null;
       if (mraOn) {
-        if (world.bestMra !== null) {
-          mraDb = band.s1m - 20 * Math.log10(mra[world.bestMra].d) + band.mra;
-          lin += db2lin(mraDb);
-        }
+        var ml = mraLink(mra, band);
+        mraDb = ml.db; mraParts = ml.parts; lin += ml.lin;
       }
-      return { snrDb: lin2db(lin), rate: rateFrom(band, lin), losDb: losDb, blockDb: blockDb, facadeDb: 0, risDb: risDb, mraDb: mraDb };
+      return { snrDb: lin2db(lin), rate: rateFrom(band, lin), losDb: losDb, blockDb: blockDb, facadeDb: 0, risDb: risDb, mraDb: mraDb, mraParts: mraParts };
     };
 
     return world;
@@ -248,11 +294,8 @@
         tiles.push({ x: FX, y: ty, ax: FX, ay: ty, blocked: false });
       }
     });
-    var mra = [];
-    for (var j = 0; j < 5; j++) {
-      var mx = 5.4 + j * 0.85;
-      mra.push({ x: mx, y: WALL + 0.12, ax: mx, ay: WALL + 0.24, ang: 0.9, blocked: false });
-    }
+    // Two MRA panels inside, on the top and bottom walls, lit through the windows
+    var mra = [mraPanel(5.2, WALL, 6.7, WALL, 0, 1), mraPanel(6.7, H - WALL, 5.2, H - WALL, 0, -1)];
 
     var doorMid = (DOOR_O2I.y0 + DOOR_O2I.y1) / 2;
     function newTarget(p) { p.tx = r(4.3, 9.2); p.ty = r(1.0, 6.6); }
@@ -282,7 +325,7 @@
       scene: 'o2i', ap: BS, apLabel: 'BS', fx: FX, windows: WINDOWS, door: DOOR_O2I, laneX: LANE_X, car: CAR,
       t: 0, tiles: tiles, mra: mra, people: people, walkers: walkers, cars: cars, NT: tiles.length,
       tileOrient: 'v',
-      user: userPos(0), pred: userPos(LOOKAHEAD), best: [], bestMra: null, losBlocker: null, active: 0
+      user: userPos(0), pred: userPos(LOOKAHEAD), best: [], losBlocker: null, active: 0
     };
 
     // People and walkers count as one blocker each; a car counts CAR_FACTOR times
@@ -364,14 +407,7 @@
       cand.sort(function (a, b) { return a.d - b.d; });
       world.best = cand.slice(0, 3).map(function (cc) { return cc.i; });
 
-      world.bestMra = null;
-      var bestD = Infinity;
-      mra.forEach(function (m, idx) {
-        m.blocked = blockers(BS, m).n > 0 || blockers(m, u).n > 0;
-        m.d = hyp(BS, m) + hyp(m, u);
-        m.cross = facadeAt(BS, m);
-        if (!m.blocked && m.d < bestD) { bestD = m.d; world.bestMra = idx; }
-      });
+      mra.forEach(function (pn) { steerPanel(pn, BS, u, function (a, b) { return blockers(a, b).n > 0; }, facadeAt); });
       var los = blockers(BS, u);
       world.losCount = los.n;
       world.losBlocker = los.first;
@@ -400,13 +436,13 @@
           lin += db2lin(risDb);
         }
       }
-      if (mraOn && world.bestMra !== null) {
-        var m = mra[world.bestMra];
-        var through = m.cross ? (m.cross.glass ? band.glass : band.concrete) : 0;
-        mraDb = band.s1m - 20 * Math.log10(m.d) + band.mra - through;
-        lin += db2lin(mraDb);
+      var mraParts = null;
+      if (mraOn) {
+        // Each tile's signal comes in through the facade: glass or concrete
+        var ml = mraLink(mra, band, function (t, b) { return t.cross ? (t.cross.glass ? b.glass : b.concrete) : 0; });
+        mraDb = ml.db; mraParts = ml.parts; lin += ml.lin;
       }
-      return { snrDb: lin2db(lin), rate: rateFrom(band, lin), losDb: losDb, blockDb: blockDb, facadeDb: facadeDb, risDb: risDb, mraDb: mraDb };
+      return { snrDb: lin2db(lin), rate: rateFrom(band, lin), losDb: losDb, blockDb: blockDb, facadeDb: facadeDb, risDb: risDb, mraDb: mraDb, mraParts: mraParts };
     };
 
     return world;
@@ -433,11 +469,9 @@
       var tx = 2.4 + i * (6.4 / 13);
       tiles.push({ x: tx, y: OUT.topFacade - 0.1, ax: tx, ay: OUT.topFacade + 0.02, blocked: false });
     }
-    var mra = [];
-    for (var j = 0; j < 5; j++) {
-      var mx = 1.9 + j * 0.55;
-      mra.push({ x: mx, y: OUT.bottomFacade + 0.12, ax: mx, ay: OUT.bottomFacade - 0.02, ang: -0.9, blocked: false });
-    }
+    // One MRA panel across the street, next to the RIS (on the near facade both
+    // the BS and the user would sit at a grazing angle)
+    var mra = [mraPanel(0.6, OUT.topFacade, 2.1, OUT.topFacade, 0, 1)];
     var walkers = [
       { x: r(1, 9), y: 5.3, vx: r(0.5, 0.8) }, { x: r(1, 9), y: 5.7, vx: -r(0.5, 0.8) },
       { x: r(1, 9), y: 1.8, vx: r(0.5, 0.8) }, { x: r(1, 9), y: 2.15, vx: -r(0.5, 0.8) }
@@ -457,7 +491,7 @@
       scene: 'out', ap: BSo, apLabel: 'BS', out: OUT,
       t: 0, tiles: tiles, mra: mra, people: [], walkers: walkers, cars: cars, NT: tiles.length,
       tileOrient: 'h',
-      user: userPos(0), pred: userPos(LOOKAHEAD), best: [], bestMra: null, losBlocker: null, active: 0
+      user: userPos(0), pred: userPos(LOOKAHEAD), best: [], losBlocker: null, active: 0
     };
 
     function blockers(a, b) {
@@ -519,13 +553,7 @@
       cand.sort(function (a, b) { return a.d - b.d; });
       world.best = cand.slice(0, 3).map(function (cc) { return cc.i; });
 
-      world.bestMra = null;
-      var bestD = Infinity;
-      mra.forEach(function (m, idx) {
-        m.blocked = blockers(BSo, m).n > 0 || blockers(m, u).n > 0 || trees(BSo, m) > 0 || trees(m, u) > 0;
-        m.d = hyp(BSo, m) + hyp(m, u);
-        if (!m.blocked && m.d < bestD) { bestD = m.d; world.bestMra = idx; }
-      });
+      mra.forEach(function (pn) { steerPanel(pn, BSo, u, function (a, b) { return blockers(a, b).n > 0 || trees(a, b) > 0; }); });
       var los = blockers(BSo, u);
       world.losCount = los.n;
       world.losBlocker = los.first;
@@ -552,11 +580,12 @@
           lin += db2lin(risDb);
         }
       }
-      if (mraOn && world.bestMra !== null) {
-        mraDb = band.s1m - 20 * Math.log10(mra[world.bestMra].d) + band.mra;
-        lin += db2lin(mraDb);
+      var mraParts = null;
+      if (mraOn) {
+        var ml = mraLink(mra, band);
+        mraDb = ml.db; mraParts = ml.parts; lin += ml.lin;
       }
-      return { snrDb: lin2db(lin), rate: rateFrom(band, lin), losDb: losDb, blockDb: blockDb, facadeDb: 0, foliageDb: foliageDb, risDb: risDb, mraDb: mraDb };
+      return { snrDb: lin2db(lin), rate: rateFrom(band, lin), losDb: losDb, blockDb: blockDb, facadeDb: 0, foliageDb: foliageDb, risDb: risDb, mraDb: mraDb, mraParts: mraParts };
     };
 
     return world;
